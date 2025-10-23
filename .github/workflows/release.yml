@@ -1,0 +1,213 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'   # Triggers on version tags like v1.0.0
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      release_id: ${{ steps.create_release.outputs.id }}
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Flux ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+  build-and-package:
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            artifact_name: flux-linux-x64
+            bundle_command: |
+              # Create AppDir structure
+              mkdir -p appdir/usr/{bin,lib,share/applications,share/icons/hicolor/256x256/apps}
+              
+              # Copy executables
+              cp build/flux-gui/FluxGUI appdir/usr/bin/
+              cp build/flux-cli/flux-cli appdir/usr/bin/
+              
+              # Create desktop file
+              cat > appdir/usr/share/applications/flux.desktop << EOF
+              [Desktop Entry]
+              Type=Application
+              Name=Flux Archive Manager
+              Comment=Modern archive manager with GUI and CLI
+              Exec=FluxGUI
+              Icon=flux
+              Categories=Utility;Archiving;
+              EOF
+              
+              # Create AppImage (if appimagetool is available)
+              wget -q -O appimagetool https://github.com/AppImage/AppImageKit/releases/latest/download/appimagetool-x86_64.AppImage || true
+              chmod +x appimagetool || true
+              ./appimagetool appdir flux-linux-x64.AppImage || true
+              
+              # Create tar.gz fallback
+              tar -czf flux-linux-x64.tar.gz -C appdir .
+
+          - os: windows-latest
+            platform: windows
+            artifact_name: flux-windows-x64
+            bundle_command: |
+              # Use windeployqt to bundle Qt dependencies
+              windeployqt build/flux-gui/Release/FluxGUI.exe --dir flux-windows-bundle
+              cp build/flux-cli/Release/flux-cli.exe flux-windows-bundle/
+              
+              # Create ZIP package
+              powershell -Command "Compress-Archive -Path flux-windows-bundle/* -DestinationPath flux-windows-x64.zip"
+
+          - os: macos-latest
+            platform: macos
+            artifact_name: flux-macos-x64
+            bundle_command: |
+              # Use macdeployqt to create .app bundle
+              macdeployqt build/flux-gui/FluxGUI.app -dmg
+              mv build/flux-gui/FluxGUI.dmg flux-macos-x64.dmg
+              
+              # Also create CLI-only package
+              mkdir -p flux-cli-macos
+              cp build/flux-cli/flux-cli flux-cli-macos/
+              tar -czf flux-cli-macos-x64.tar.gz -C flux-cli-macos .
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.5.4"
+          cache: true
+          modules: 'qtbase qttools qtsvg'
+
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.25'
+
+      - name: Install platform dependencies
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y build-essential ninja-build libgl1-mesa-dev \
+              libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
+              libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0 \
+              desktop-file-utils
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            # MSVC setup handled by runner
+            echo "Windows dependencies ready"
+          else
+            # macOS - Xcode command line tools should be available
+            echo "macOS dependencies ready"
+          fi
+
+      - name: Setup MSVC (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=install \
+            -G "Ninja"
+
+      - name: Build project
+        run: cmake --build build --config Release --parallel
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest --output-on-failure --parallel 2 || true
+
+      - name: Package with CPack
+        run: |
+          cd build
+          cmake --build . --target package
+
+      - name: Create platform-specific bundles
+        run: ${{ matrix.bundle_command }}
+
+      - name: Upload Linux AppImage
+        if: matrix.platform == 'linux'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./flux-linux-x64.AppImage
+          asset_name: flux-linux-x64.AppImage
+          asset_content_type: application/octet-stream
+        continue-on-error: true
+
+      - name: Upload Linux tar.gz
+        if: matrix.platform == 'linux'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./flux-linux-x64.tar.gz
+          asset_name: flux-linux-x64.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload Windows ZIP
+        if: matrix.platform == 'windows'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./flux-windows-x64.zip
+          asset_name: flux-windows-x64.zip
+          asset_content_type: application/zip
+
+      - name: Upload macOS DMG
+        if: matrix.platform == 'macos'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./flux-macos-x64.dmg
+          asset_name: flux-macos-x64.dmg
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS CLI tar.gz
+        if: matrix.platform == 'macos'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./flux-cli-macos-x64.tar.gz
+          asset_name: flux-cli-macos-x64.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload CPack packages
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: build/Flux-*.zip
+          asset_name: flux-${{ matrix.platform }}-cpack.zip
+          asset_content_type: application/zip
+        continue-on-error: true

@@ -1,0 +1,17 @@
+[Desktop Entry]
+Name=Flux Archive Manager
+Name[zh_CN]=Flux 归档管理器
+Comment=Modern archive file manager with intuitive GUI
+Comment[zh_CN]=现代化的归档文件管理工具，提供直观的图形界面
+Exec=FluxGUI %F
+Icon=flux
+Terminal=false
+Type=Application
+Categories=Utility;Archiving;Compression;
+MimeType=application/zip;application/x-7z-compressed;application/x-tar;application/x-compressed-tar;application/x-xz-compressed-tar;application/x-zstd-compressed-tar;
+StartupNotify=true
+StartupWMClass=FluxGUI
+
+
+
+

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+    <mime-type type="application/x-flux-archive">
+        <comment>Flux Archive</comment>
+        <comment xml:lang="zh_CN">Flux 归档文件</comment>
+        <icon name="flux"/>
+        <glob pattern="*.flux"/>
+    </mime-type>
+    
+    <!-- Enhanced support for existing archive types -->
+    <mime-type type="application/x-zstd-compressed-tar">
+        <comment>ZSTD compressed TAR archive</comment>
+        <comment xml:lang="zh_CN">ZSTD 压缩的 TAR 归档</comment>
+        <icon name="application-x-archive"/>
+        <glob pattern="*.tar.zst"/>
+        <glob pattern="*.tar.zstd"/>
+        <magic priority="50">
+            <match value="0x28B52FFD" type="big32" offset="0"/>
+        </magic>
+    </mime-type>
+</mime-info>
+
+
+
+

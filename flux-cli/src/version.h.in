@@ -1,0 +1,14 @@
+#pragma once
+
+#define FLUX_CLI_VERSION_MAJOR @flux-cli_VERSION_MAJOR@
+#define FLUX_CLI_VERSION_MINOR @flux-cli_VERSION_MINOR@
+#define FLUX_CLI_VERSION_PATCH @flux-cli_VERSION_PATCH@
+#define FLUX_CLI_VERSION_STRING "@flux-cli_VERSION@"
+
+namespace FluxCLI {
+    constexpr int VERSION_MAJOR = FLUX_CLI_VERSION_MAJOR;
+    constexpr int VERSION_MINOR = FLUX_CLI_VERSION_MINOR;
+    constexpr int VERSION_PATCH = FLUX_CLI_VERSION_PATCH;
+    constexpr const char* VERSION_STRING = FLUX_CLI_VERSION_STRING;
+}
+

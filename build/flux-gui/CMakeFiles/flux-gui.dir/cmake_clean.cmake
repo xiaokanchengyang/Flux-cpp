@@ -1,0 +1,40 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/flux-gui_autogen.dir/AutogenUsed.txt"
+  "CMakeFiles/flux-gui_autogen.dir/ParseCache.txt"
+  "flux-gui_autogen"
+  "CMakeFiles/flux-gui.dir/flux-gui_autogen/3YJK5W5UP7/qrc_resources.cpp.obj"
+  "CMakeFiles/flux-gui.dir/flux-gui_autogen/3YJK5W5UP7/qrc_resources.cpp.obj.d"
+  "CMakeFiles/flux-gui.dir/flux-gui_autogen/mocs_compilation.cpp.obj"
+  "CMakeFiles/flux-gui.dir/flux-gui_autogen/mocs_compilation.cpp.obj.d"
+  "CMakeFiles/flux-gui.dir/resources/flux.rc.obj"
+  "CMakeFiles/flux-gui.dir/src/main.cpp.obj"
+  "CMakeFiles/flux-gui.dir/src/main.cpp.obj.d"
+  "CMakeFiles/flux-gui.dir/src/main_window.cpp.obj"
+  "CMakeFiles/flux-gui.dir/src/main_window.cpp.obj.d"
+  "CMakeFiles/flux-gui.dir/src/models/archive_model.cpp.obj"
+  "CMakeFiles/flux-gui.dir/src/models/archive_model.cpp.obj.d"
+  "CMakeFiles/flux-gui.dir/src/utils/file_utils.cpp.obj"
+  "CMakeFiles/flux-gui.dir/src/utils/file_utils.cpp.obj.d"
+  "CMakeFiles/flux-gui.dir/src/utils/resource_manager.cpp.obj"
+  "CMakeFiles/flux-gui.dir/src/utils/resource_manager.cpp.obj.d"
+  "CMakeFiles/flux-gui.dir/src/views/browse_page.cpp.obj"
+  "CMakeFiles/flux-gui.dir/src/views/browse_page.cpp.obj.d"
+  "CMakeFiles/flux-gui.dir/src/views/browse_view.cpp.obj"
+  "CMakeFiles/flux-gui.dir/src/views/browse_view.cpp.obj.d"
+  "CMakeFiles/flux-gui.dir/src/views/extract_view.cpp.obj"
+  "CMakeFiles/flux-gui.dir/src/views/extract_view.cpp.obj.d"
+  "CMakeFiles/flux-gui.dir/src/views/pack_view.cpp.obj"
+  "CMakeFiles/flux-gui.dir/src/views/pack_view.cpp.obj.d"
+  "CMakeFiles/flux-gui.dir/src/views/welcome_view.cpp.obj"
+  "CMakeFiles/flux-gui.dir/src/views/welcome_view.cpp.obj.d"
+  "FluxGUI.exe"
+  "FluxGUI.exe.manifest"
+  "FluxGUI.pdb"
+  "flux-gui_autogen/3YJK5W5UP7/qrc_resources.cpp"
+  "libFluxGUI.dll.a"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX RC)
+  include(CMakeFiles/flux-gui.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

@@ -1,0 +1,9 @@
+C:/Users/p20000415/Music/Flux-cpp/flux-gui/build/CMakeFiles/flux-gui.dir
+C:/Users/p20000415/Music/Flux-cpp/flux-gui/build/CMakeFiles/edit_cache.dir
+C:/Users/p20000415/Music/Flux-cpp/flux-gui/build/CMakeFiles/rebuild_cache.dir
+C:/Users/p20000415/Music/Flux-cpp/flux-gui/build/CMakeFiles/list_install_components.dir
+C:/Users/p20000415/Music/Flux-cpp/flux-gui/build/CMakeFiles/install.dir
+C:/Users/p20000415/Music/Flux-cpp/flux-gui/build/CMakeFiles/install/local.dir
+C:/Users/p20000415/Music/Flux-cpp/flux-gui/build/CMakeFiles/install/strip.dir
+C:/Users/p20000415/Music/Flux-cpp/flux-gui/build/CMakeFiles/flux-gui_autogen_timestamp_deps.dir
+C:/Users/p20000415/Music/Flux-cpp/flux-gui/build/CMakeFiles/flux-gui_autogen.dir

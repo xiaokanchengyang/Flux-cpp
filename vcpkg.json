@@ -1,0 +1,35 @@
+{
+  "name": "flux-archive-manager",
+  "version": "1.0.0",
+  "description": "Cross-platform archive management tool supporting multiple compression formats",
+  "homepage": "https://github.com/flux-archive-manager/flux-cpp",
+  "license": "MIT",
+  "dependencies": [
+    {
+      "name": "libzip",
+      "version>=": "1.9.2"
+    },
+    {
+      "name": "zlib",
+      "version>=": "1.2.11"
+    },
+    {
+      "name": "liblzma",
+      "version>=": "5.2.5"
+    },
+    {
+      "name": "zstd",
+      "version>=": "1.5.0"
+    },
+    {
+      "name": "fmt",
+      "version>=": "9.1.0"
+    },
+    {
+      "name": "spdlog",
+      "version>=": "1.11.0"
+    }
+  ],
+  "builtin-baseline": "2023.08.09"
+}
+

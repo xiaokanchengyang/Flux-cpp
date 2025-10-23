@@ -1,0 +1,3 @@
+C:\Qt\Tools\CMake_64\bin\cmake.exe -E rm -f CMakeFiles\flux-cli.dir/objects.a
+C:\Qt\Tools\mingw1310_64\bin\ar.exe qc CMakeFiles\flux-cli.dir/objects.a @CMakeFiles\flux-cli.dir\objects1.rsp
+C:\Qt\Tools\mingw1310_64\bin\c++.exe -O3 -DNDEBUG -Wl,--whole-archive CMakeFiles\flux-cli.dir/objects.a -Wl,--no-whole-archive -o ..\bin\flux.exe -Wl,--out-implib,libflux.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\flux-cli.dir\linkLibs.rsp

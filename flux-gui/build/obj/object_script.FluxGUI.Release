@@ -1,0 +1,15 @@
+build/obj/main.o
+build/obj/main_window.o
+build/obj/welcome_view.o
+build/obj/pack_view.o
+build/obj/extract_view.o
+build/obj/browse_view.o
+build/obj/file_utils.o
+build/obj/archive_model.o
+build/obj/qrc_resources.o
+build/obj/moc_main_window.o
+build/obj/moc_welcome_view.o
+build/obj/moc_pack_view.o
+build/obj/moc_extract_view.o
+build/obj/moc_browse_view.o
+build/obj/moc_archive_model.o

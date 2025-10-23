@@ -8,6 +8,10 @@
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QThread>
+#include <flux-core/packer.h>
+#include <flux-core/exceptions.h>
+#include <spdlog/spdlog.h>
 
 PackView::PackView(QWidget *parent)
     : QWidget(parent)
@@ -25,6 +29,7 @@ PackView::PackView(QWidget *parent)
     , m_cancelButton(nullptr)
     , m_progressBar(nullptr)
     , m_statusLabel(nullptr)
+    , m_workerThread(nullptr)
 {
     setupUI();
     setAcceptDrops(true);
@@ -270,9 +275,6 @@ void PackView::onBrowseOutput() {
 }
 
 void PackView::onStartPacking() {
-    // TODO: Implement actual packing logic
-    // This is a placeholder implementation
-    
     if (m_fileList->count() == 0) {
         QMessageBox::warning(this, "Warning", "Please add files or folders to pack first.");
         return;
@@ -283,39 +285,36 @@ void PackView::onStartPacking() {
         return;
     }
     
-    // Show progress
-    m_progressBar->setVisible(true);
-    m_progressBar->setValue(0);
-    m_statusLabel->setText("Preparing to pack...");
-    m_packButton->setEnabled(false);
-    m_cancelButton->setVisible(true);
+    // Prepare configuration
+    PackWorkerThread::PackConfig config;
+    for (int i = 0; i < m_fileList->count(); ++i) {
+        config.inputPaths.append(m_fileList->item(i)->data(Qt::UserRole).toString());
+    }
+    config.outputPath = m_outputEdit->text();
+    config.format = m_formatCombo->currentText();
+    config.compressionLevel = m_compressionSpin->value();
+    config.threadCount = m_threadsSpin->value();
+    config.password = m_passwordEdit->text();
     
-    emit packingStarted();
+    // Create and start worker thread
+    m_workerThread = new PackWorkerThread(config, this);
     
-    // TODO: Execute actual packing operation in background thread
-    // Use timer to simulate progress here
-    QTimer* timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, [this, timer]() {
-        static int progress = 0;
-        progress += 10;
-        m_progressBar->setValue(progress);
-        m_statusLabel->setText(QString("Packing progress: %1%").arg(progress));
-        
-        if (progress >= 100) {
-            timer->stop();
-            timer->deleteLater();
-            
-            m_progressBar->setVisible(false);
-            m_statusLabel->setText("Packing completed!");
-            m_packButton->setEnabled(true);
-            m_cancelButton->setVisible(false);
-            
-            emit packingFinished(true, "Archive file created successfully");
-            
-            QMessageBox::information(this, "Complete", "Archive file created successfully!");
-        }
-    });
-    timer->start(500);
+    // Connect signals
+    connect(m_workerThread, &PackWorkerThread::packingStarted,
+            this, &PackView::onPackingStarted);
+    connect(m_workerThread, &PackWorkerThread::progressUpdated,
+            this, &PackView::onProgressUpdated);
+    connect(m_workerThread, &PackWorkerThread::packingFinished,
+            this, &PackView::onPackingFinished);
+    connect(m_workerThread, &QThread::finished,
+            m_workerThread, &QObject::deleteLater);
+    
+    // Connect cancel button
+    connect(m_cancelButton, &QPushButton::clicked,
+            m_workerThread, &PackWorkerThread::cancel);
+    
+    // Start packing
+    m_workerThread->start();
 }
 
 void PackView::onFormatChanged() {
@@ -350,4 +349,172 @@ void PackView::updateUI() {
     } else {
         m_statusLabel->setText("Please add files or folders to pack");
     }
+}
+
+// Drag and drop support
+void PackView::dragEnterEvent(QDragEnterEvent* event) {
+    if (event->mimeData()->hasUrls()) {
+        event->acceptProposedAction();
+    }
+}
+
+void PackView::dropEvent(QDropEvent* event) {
+    QStringList filePaths;
+    for (const QUrl& url : event->mimeData()->urls()) {
+        if (url.isLocalFile()) {
+            filePaths.append(url.toLocalFile());
+        }
+    }
+    
+    if (!filePaths.isEmpty()) {
+        addFiles(filePaths);
+    }
+    
+    event->acceptProposedAction();
+}
+
+void PackView::onPackingStarted() {
+    // Show progress UI
+    m_progressBar->setVisible(true);
+    m_progressBar->setValue(0);
+    m_statusLabel->setText("Preparing to pack...");
+    m_packButton->setEnabled(false);
+    m_cancelButton->setVisible(true);
+    
+    // Disable UI controls during packing
+    m_fileListGroup->setEnabled(false);
+    m_settingsGroup->setEnabled(false);
+    
+    emit packingStarted();
+}
+
+void PackView::onProgressUpdated(const QString& currentFile, int percentage, qint64 processed, qint64 total) {
+    m_progressBar->setValue(percentage);
+    
+    QString statusText = QString("Packing: %1 (%2%)")
+                        .arg(currentFile)
+                        .arg(percentage);
+    
+    if (total > 0) {
+        statusText += QString(" - %1/%2 files")
+                     .arg(processed)
+                     .arg(total);
+    }
+    
+    m_statusLabel->setText(statusText);
+}
+
+void PackView::onPackingFinished(bool success, const QString& message) {
+    // Hide progress UI
+    m_progressBar->setVisible(false);
+    m_packButton->setEnabled(true);
+    m_cancelButton->setVisible(false);
+    
+    // Re-enable UI controls
+    m_fileListGroup->setEnabled(true);
+    m_settingsGroup->setEnabled(true);
+    
+    // Update status
+    if (success) {
+        m_statusLabel->setText("Packing completed successfully!");
+        QMessageBox::information(this, "Complete", message);
+    } else {
+        m_statusLabel->setText("Packing failed!");
+        QMessageBox::critical(this, "Error", message);
+    }
+    
+    emit packingFinished(success, message);
+    
+    // Clean up worker thread reference
+    m_workerThread = nullptr;
+}
+
+// PackWorkerThread implementation
+PackWorkerThread::PackWorkerThread(const PackConfig& config, QObject* parent)
+    : QThread(parent), m_config(config) {
+}
+
+void PackWorkerThread::run() {
+    emit packingStarted();
+    
+    try {
+        // Convert format string to enum
+        Flux::ArchiveFormat format;
+        if (m_config.format == "zip") {
+            format = Flux::ArchiveFormat::ZIP;
+        } else if (m_config.format == "tar.gz") {
+            format = Flux::ArchiveFormat::TAR_GZ;
+        } else if (m_config.format == "tar.xz") {
+            format = Flux::ArchiveFormat::TAR_XZ;
+        } else if (m_config.format == "tar.zst") {
+            format = Flux::ArchiveFormat::TAR_ZSTD;
+        } else if (m_config.format == "7z") {
+            format = Flux::ArchiveFormat::SEVEN_ZIP;
+        } else {
+            format = Flux::ArchiveFormat::ZIP; // Default
+        }
+        
+        // Create packer
+        auto packer = Flux::createPacker(format);
+        
+        // Prepare input paths
+        std::vector<std::filesystem::path> inputPaths;
+        for (const QString& path : m_config.inputPaths) {
+            inputPaths.push_back(path.toStdString());
+        }
+        
+        // Set up pack options
+        Flux::PackOptions options;
+        options.compression_level = m_config.compressionLevel;
+        options.thread_count = m_config.threadCount;
+        if (!m_config.password.isEmpty()) {
+            options.password = m_config.password.toStdString();
+        }
+        
+        // Progress callback
+        auto progressCallback = [this](const std::string& currentFile, float progress, 
+                                     size_t processed, size_t total) {
+            if (m_cancelled.load()) {
+                return;
+            }
+            
+            int percentage = static_cast<int>(progress * 100);
+            emit progressUpdated(QString::fromStdString(currentFile), percentage, 
+                               processed, total);
+        };
+        
+        // Error callback
+        auto errorCallback = [this](const std::string& error) {
+            spdlog::error("Packing error: {}", error);
+        };
+        
+        // Execute packing
+        auto result = packer->pack(inputPaths, m_config.outputPath.toStdString(), 
+                                 options, progressCallback, errorCallback);
+        
+        if (m_cancelled.load()) {
+            emit packingFinished(false, "Packing cancelled by user");
+        } else if (result.success) {
+            QString message = QString("Successfully packed %1 files (%2 processed)")
+                            .arg(result.files_packed)
+                            .arg(QString::number(result.total_size));
+            emit packingFinished(true, message);
+            spdlog::info("Packing completed successfully: {} files", result.files_packed);
+        } else {
+            emit packingFinished(false, QString::fromStdString(result.error_message));
+            spdlog::error("Packing failed: {}", result.error_message);
+        }
+        
+    } catch (const Flux::UnsupportedFormatException& e) {
+        emit packingFinished(false, QString("Unsupported format: %1").arg(e.what()));
+        spdlog::error("Unsupported format: {}", e.what());
+    } catch (const std::exception& e) {
+        emit packingFinished(false, QString("Packing error: %1").arg(e.what()));
+        spdlog::error("Packing exception: {}", e.what());
+    }
+}
+
+void PackWorkerThread::cancel() {
+    m_cancelled.store(true);
+    spdlog::info("Packing cancellation requested");
 }

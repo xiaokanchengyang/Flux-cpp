@@ -100,10 +100,10 @@ void setupInspectCommand(CLI::App* app, bool& verbose, bool& quiet) {
 int executeInspectCommand(const InspectConfig& config) {
     try {
         if (!config.quiet) {
-            spdlog::info("检查归档: {}", config.archive.string());
+            spdlog::info("Inspecting archive: {}", config.archive.string());
         }
         
-        // 检测归档格式
+        // Detect archive format
         Flux::ArchiveFormat format;
         try {
             format = Utils::FormatUtils::detectFormatFromContent(config.archive);
@@ -112,23 +112,23 @@ int executeInspectCommand(const InspectConfig& config) {
         }
         
         if (config.verbose) {
-            spdlog::debug("检测到格式: {}", Flux::formatToString(format));
+            spdlog::debug("Detected format: {}", Flux::formatToString(format));
         }
         
-        // 获取归档内容
+        // Get archive contents
         auto entries = getArchiveContents(config.archive, config.password);
         
         if (entries.empty()) {
             if (!config.quiet) {
-                spdlog::info("归档为空或无法读取内容");
+                spdlog::info("Archive is empty or cannot read contents");
             }
             return 0;
         }
         
-        // 过滤条目
+        // Filter entries
         auto filtered_entries = filterEntries(entries, config);
         
-        // 根据格式输出
+        // Output according to format
         switch (config.output_format) {
             case OutputFormat::LIST:
                 outputList(filtered_entries, config);
@@ -144,7 +144,7 @@ int executeInspectCommand(const InspectConfig& config) {
                 break;
         }
         
-        // 显示统计信息 (除了 JSON 格式)
+        // Show statistics (except for JSON format)
         if (config.output_format != OutputFormat::JSON && !config.quiet) {
             showStatistics(filtered_entries, config);
         }
@@ -152,22 +152,22 @@ int executeInspectCommand(const InspectConfig& config) {
         return 0;
         
     } catch (const Flux::FileNotFoundException& e) {
-        spdlog::error("文件未找到: {}", e.what());
+        spdlog::error("File not found: {}", e.what());
         return 2;
     } catch (const Flux::PermissionDeniedException& e) {
-        spdlog::error("权限不足: {}", e.what());
+        spdlog::error("Permission denied: {}", e.what());
         return 3;
     } catch (const Flux::CorruptedArchiveException& e) {
-        spdlog::error("归档文件损坏: {}", e.what());
+        spdlog::error("Archive file corrupted: {}", e.what());
         return 4;
     } catch (const Flux::UnsupportedFormatException& e) {
-        spdlog::error("不支持的格式: {}", e.what());
+        spdlog::error("Unsupported format: {}", e.what());
         return 5;
     } catch (const Flux::InvalidPasswordException& e) {
-        spdlog::error("密码错误: {}", e.what());
+        spdlog::error("Invalid password: {}", e.what());
         return 6;
     } catch (const std::exception& e) {
-        spdlog::error("错误: {}", e.what());
+        spdlog::error("Error: {}", e.what());
         return 1;
     }
 }
@@ -177,10 +177,10 @@ std::vector<DisplayEntry> getArchiveContents(const std::filesystem::path& archiv
     std::vector<DisplayEntry> entries;
     
     try {
-        // 这里需要实现获取归档内容的逻辑
-        // 使用 Flux::listArchiveContents() 或类似函数
+        // TODO: Implement archive content retrieval logic here
+        // Use Flux::listArchiveContents() or similar function
         
-        // 伪代码：
+        // Pseudo code:
         // auto flux_entries = Flux::listArchiveContents(archive_path, password);
         // for (const auto& flux_entry : flux_entries) {
         //     DisplayEntry entry;
@@ -195,7 +195,7 @@ std::vector<DisplayEntry> getArchiveContents(const std::filesystem::path& archiv
         //     entries.push_back(entry);
         // }
         
-        // 临时模拟数据
+        // Temporary mock data
         DisplayEntry entry1;
         entry1.name = "example.txt";
         entry1.path = "example.txt";
@@ -219,7 +219,7 @@ std::vector<DisplayEntry> getArchiveContents(const std::filesystem::path& archiv
         entries.push_back(entry2);
         
     } catch (const std::exception& e) {
-        throw Flux::CorruptedArchiveException("无法读取归档内容: " + std::string(e.what()));
+        throw Flux::CorruptedArchiveException("Cannot read archive contents: " + std::string(e.what()));
     }
     
     return entries;
@@ -237,22 +237,22 @@ std::vector<DisplayEntry> filterEntries(const std::vector<DisplayEntry>& entries
             filter_regex = std::regex(config.filter_pattern, std::regex_constants::icase);
             use_filter = true;
         } catch (const std::regex_error& e) {
-            spdlog::warn("无效的过滤正则表达式: {}", config.filter_pattern);
+            spdlog::warn("Invalid filter regex pattern: {}", config.filter_pattern);
         }
     }
     
     for (const auto& entry : entries) {
-        // 检查隐藏文件
+        // Check hidden files
         if (!config.show_hidden && entry.name.starts_with('.')) {
             continue;
         }
         
-        // 检查深度限制
+        // Check depth limit
         if (config.max_depth >= 0 && entry.depth > config.max_depth) {
             continue;
         }
         
-        // 检查过滤模式
+        // Check filter pattern
         if (use_filter && !std::regex_search(entry.name, filter_regex)) {
             continue;
         }
@@ -284,7 +284,7 @@ void outputList(const std::vector<DisplayEntry>& entries, const InspectConfig& c
 }
 
 void outputTree(const std::vector<DisplayEntry>& entries, const InspectConfig& config) {
-    // 构建树状结构
+    // Build tree structure
     std::map<std::string, std::vector<DisplayEntry>> tree;
     
     for (const auto& entry : entries) {
@@ -296,7 +296,7 @@ void outputTree(const std::vector<DisplayEntry>& entries, const InspectConfig& c
         tree[parent_path].push_back(entry);
     }
     
-    // 递归输出树状结构
+    // Recursively output tree structure
     std::function<void(const std::string&, int)> print_tree = [&](const std::string& path, int depth) {
         auto it = tree.find(path);
         if (it == tree.end()) return;
@@ -304,19 +304,19 @@ void outputTree(const std::vector<DisplayEntry>& entries, const InspectConfig& c
         for (size_t i = 0; i < it->second.size(); ++i) {
             const auto& entry = it->second[i];
             
-            // 打印缩进
+            // Print indentation
             for (int j = 0; j < depth; ++j) {
                 std::cout << "  ";
             }
             
-            // 打印树状连接符
+            // Print tree connector
             if (i == it->second.size() - 1) {
                 std::cout << "└── ";
             } else {
                 std::cout << "├── ";
             }
             
-            // 打印文件名
+            // Print filename
             std::cout << entry.name;
             
             if (entry.is_directory) {
@@ -327,7 +327,7 @@ void outputTree(const std::vector<DisplayEntry>& entries, const InspectConfig& c
             
             std::cout << "\n";
             
-            // 递归处理子目录
+            // Recursively process subdirectories
             if (entry.is_directory) {
                 print_tree(entry.path, depth + 1);
             }
@@ -340,7 +340,7 @@ void outputTree(const std::vector<DisplayEntry>& entries, const InspectConfig& c
 void outputJSON(const std::vector<DisplayEntry>& entries, const InspectConfig& config) {
     nlohmann::json json_output;
     json_output["archive"] = config.archive.string();
-    json_output["format"] = "unknown"; // 需要从配置中获取
+    json_output["format"] = "unknown"; // TODO: Get from configuration
     json_output["entries"] = nlohmann::json::array();
     
     for (const auto& entry : entries) {
@@ -361,7 +361,7 @@ void outputJSON(const std::vector<DisplayEntry>& entries, const InspectConfig& c
 }
 
 void outputDetailed(const std::vector<DisplayEntry>& entries, const InspectConfig& config) {
-    // 计算列宽
+    // Calculate column widths
     size_t max_name_width = 0;
     size_t max_size_width = 0;
     
@@ -373,17 +373,17 @@ void outputDetailed(const std::vector<DisplayEntry>& entries, const InspectConfi
         }
     }
     
-    // 输出表头
+    // Output table header
     std::cout << std::left 
-              << std::setw(max_name_width + 2) << "名称"
-              << std::setw(max_size_width + 2) << "大小"
-              << std::setw(12) << "压缩大小"
-              << std::setw(20) << "修改时间"
-              << "权限\n";
+              << std::setw(max_name_width + 2) << "Name"
+              << std::setw(max_size_width + 2) << "Size"
+              << std::setw(12) << "Compressed"
+              << std::setw(20) << "Modified"
+              << "Permissions\n";
     
     std::cout << std::string(max_name_width + max_size_width + 36, '-') << "\n";
     
-    // 输出条目
+    // Output entries
     for (const auto& entry : entries) {
         std::cout << std::left 
                   << std::setw(max_name_width + 2) << entry.name;
@@ -418,14 +418,14 @@ void showStatistics(const std::vector<DisplayEntry>& entries, const InspectConfi
         }
     }
     
-    std::cout << "\n统计信息:\n";
-    std::cout << "  文件数量: " << total_files << "\n";
-    std::cout << "  目录数量: " << total_dirs << "\n";
-    std::cout << "  原始大小: " << Utils::FormatUtils::formatFileSize(total_uncompressed) << "\n";
-    std::cout << "  压缩大小: " << Utils::FormatUtils::formatFileSize(total_compressed) << "\n";
+    std::cout << "\nStatistics:\n";
+    std::cout << "  Files: " << total_files << "\n";
+    std::cout << "  Directories: " << total_dirs << "\n";
+    std::cout << "  Original size: " << Utils::FormatUtils::formatFileSize(total_uncompressed) << "\n";
+    std::cout << "  Compressed size: " << Utils::FormatUtils::formatFileSize(total_compressed) << "\n";
     
     if (total_uncompressed > 0) {
-        std::cout << "  压缩比: " 
+        std::cout << "  Compression ratio: " 
                   << Utils::FormatUtils::formatCompressionRatio(total_uncompressed, total_compressed) 
                   << "\n";
     }

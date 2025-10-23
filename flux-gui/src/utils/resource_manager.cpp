@@ -1,7 +1,8 @@
 #include "resource_manager.h"
-#include <QDebug>
-#include <QFileInfo>
+#include <QStandardPaths>
+#include <QDir>
 #include <QCoreApplication>
+#include <QDebug>
 
 ResourceManager& ResourceManager::instance() {
     static ResourceManager instance;
@@ -9,60 +10,52 @@ ResourceManager& ResourceManager::instance() {
 }
 
 QString ResourceManager::getIconPath(const QString& iconName) const {
-    return QString(Paths::ICONS) + iconName;
+    return QString("%1%2").arg(Paths::ICONS, iconName);
 }
 
 QString ResourceManager::getThemePath(const QString& themeName) const {
-    return QString(Paths::THEMES) + themeName + ".qss";
+    return QString("%1%2.qss").arg(Paths::THEMES, themeName);
 }
 
 QString ResourceManager::getTranslationPath(const QString& language) const {
-    return QString(Paths::TRANSLATIONS) + "flux_" + language + ".qm";
+    return QString("%1flux_%2.qm").arg(Paths::TRANSLATIONS, language);
 }
 
 QIcon ResourceManager::getIcon(const QString& iconName) {
-    // Check cache first
     auto it = m_iconCache.find(iconName);
     if (it != m_iconCache.end()) {
         return it->second;
     }
     
-    // Load icon and cache it
     QString iconPath = getIconPath(iconName);
     QIcon icon(iconPath);
     
-    if (icon.isNull()) {
+    if (!icon.isNull()) {
+        m_iconCache[iconName] = icon;
+    } else {
         qWarning() << "Failed to load icon:" << iconPath;
         // Return a default icon or empty icon
-        icon = QIcon(); // Empty icon
+        icon = QIcon(); // Empty icon as fallback
     }
     
-    m_iconCache[iconName] = icon;
     return icon;
 }
 
 QPixmap ResourceManager::getPixmap(const QString& iconName, const QSize& size) {
-    QString cacheKey = iconName + QString("_%1x%2").arg(size.width()).arg(size.height());
+    QString cacheKey = QString("%1_%2x%3").arg(iconName).arg(size.width()).arg(size.height());
     
-    // Check cache first
     auto it = m_pixmapCache.find(cacheKey);
     if (it != m_pixmapCache.end()) {
         return it->second;
     }
     
-    // Load pixmap
-    QString iconPath = getIconPath(iconName);
-    QPixmap pixmap(iconPath);
+    QIcon icon = getIcon(iconName);
+    QPixmap pixmap = icon.pixmap(size.isValid() ? size : QSize(32, 32));
     
-    if (!pixmap.isNull() && size.isValid()) {
-        pixmap = pixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    if (!pixmap.isNull()) {
+        m_pixmapCache[cacheKey] = pixmap;
     }
     
-    if (pixmap.isNull()) {
-        qWarning() << "Failed to load pixmap:" << iconPath;
-    }
-    
-    m_pixmapCache[cacheKey] = pixmap;
     return pixmap;
 }
 
@@ -102,19 +95,22 @@ bool ResourceManager::ensureDirectoriesExist() {
     QDir dir;
     bool success = true;
     
-    // Create directories if they don't exist
+    // Create config directory
     if (!dir.exists(m_configDir)) {
         success &= dir.mkpath(m_configDir);
     }
     
+    // Create temp directory
     if (!dir.exists(m_tempDir)) {
         success &= dir.mkpath(m_tempDir);
     }
     
+    // Create logs directory
     if (!dir.exists(m_logsDir)) {
         success &= dir.mkpath(m_logsDir);
     }
     
+    // Create user data directory
     if (!dir.exists(m_userDataDir)) {
         success &= dir.mkpath(m_userDataDir);
     }
@@ -135,7 +131,7 @@ bool ResourceManager::validateResources() const {
     
     for (const QString& iconName : essentialIcons) {
         QString iconPath = getIconPath(iconName);
-        if (!QFileInfo::exists(iconPath)) {
+        if (!QFile::exists(iconPath)) {
             qWarning() << "Missing essential icon:" << iconPath;
             return false;
         }
@@ -167,14 +163,18 @@ void ResourceManager::preloadIcons() {
 }
 
 void ResourceManager::initializeDirectories() const {
+    if (m_initialized) {
+        return;
+    }
+    
     // Get standard paths
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QString tempPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
     
-    // Set directory paths
-    m_configDir = appDataPath + "/" + Paths::CONFIG;
-    m_tempDir = tempPath + "/flux/" + Paths::TEMP;
-    m_logsDir = appDataPath + "/" + Paths::LOGS;
+    // Set up directory paths
+    m_configDir = QDir(appDataPath).filePath(Paths::CONFIG);
+    m_tempDir = QDir(tempPath).filePath(QString("flux_%1").arg(QCoreApplication::applicationPid()));
+    m_logsDir = QDir(appDataPath).filePath(Paths::LOGS);
     m_userDataDir = appDataPath;
     
     m_initialized = true;

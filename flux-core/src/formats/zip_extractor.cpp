@@ -3,9 +3,8 @@
 #include <fstream>
 #include <chrono>
 #include <iostream>
-// TODO: Add spdlog dependency
-// #include <spdlog/spdlog.h>
-// #include <fmt/format.h>
+#include <spdlog/spdlog.h>
+#include <fmt/format.h>
 
 namespace Flux {
     namespace Formats {

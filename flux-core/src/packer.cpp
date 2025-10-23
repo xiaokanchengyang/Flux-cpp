@@ -6,8 +6,7 @@
 #include <ranges>
 #include <algorithm>
 #include <numeric>
-#include <expected>
-#include <format>
+#include "flux-core/compat.h"
 #include <cctype>
 #include <span>
 #include <string>
@@ -20,8 +19,12 @@ namespace Flux::Formats {
     class SevenZipPacker;
 }
 
-// Note: Format implementations should be linked separately, not included as .cpp files
-// This is a temporary solution until proper library structure is implemented
+// Forward declarations for format implementation classes
+namespace Flux::Formats {
+    std::unique_ptr<Packer> createZipPacker();
+    std::unique_ptr<Packer> createTarPacker();
+    std::unique_ptr<Packer> createSevenZipPacker();
+}
 
 namespace Flux {
     // Default implementation of Packer base class using modern C++23 features
@@ -38,7 +41,7 @@ namespace Flux {
         });
 
         if (invalid_file != inputs.end()) {
-            return Flux::unexpected<std::string>{std::format("{}: {}", 
+            return Flux::unexpected<std::string>{Flux::format("{}: {}", 
                                              Constants::ErrorMessages::FILE_NOT_FOUND,
                                              invalid_file->string())};
         }
@@ -72,7 +75,7 @@ namespace Flux {
             if (std::filesystem::is_regular_file(path, ec) && !ec) {
                 return std::filesystem::file_size(path, ec);
             } else if (std::filesystem::is_directory(path, ec) && !ec) {
-                return std::ranges::fold_left(
+                return Flux::fold_left(
                     std::filesystem::recursive_directory_iterator(path, ec)
                     | std::views::filter([](const auto& entry) {
                         std::error_code ec;
@@ -115,12 +118,21 @@ namespace Flux {
         }
     }
 
-    // Factory function implementation - temporary stub until format implementations are complete
+    // Factory function implementation
     std::unique_ptr<Packer> createPacker(ArchiveFormat format) {
-        // TODO: Implement actual format-specific packers
-        // For now, throw an exception to indicate incomplete implementation
-        throw UnsupportedFormatException(std::format("Format implementation not yet available: {}", 
-                                                    formatToString(format)));
+        switch (format) {
+            case ArchiveFormat::ZIP:
+                return Formats::createZipPacker();
+            case ArchiveFormat::TAR_GZ:
+            case ArchiveFormat::TAR_XZ:
+            case ArchiveFormat::TAR_ZSTD:
+                return Formats::createTarPacker();
+            case ArchiveFormat::SEVEN_ZIP:
+                return Formats::createSevenZipPacker();
+            default:
+                throw UnsupportedFormatException(Flux::format("Unsupported format: {}", 
+                                                            formatToString(format)));
+        }
     }
 
     // String to format conversion with error handling using C++23 features

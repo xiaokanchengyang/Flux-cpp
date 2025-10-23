@@ -5,9 +5,8 @@
 #include <iostream>
 // TODO: Add libzip dependency
 // #include <zip.h>
-// TODO: Add spdlog dependency
-// #include <spdlog/spdlog.h>
-// #include <fmt/format.h>
+#include <spdlog/spdlog.h>
+#include <fmt/format.h>
 
 namespace Flux {
     namespace Formats {

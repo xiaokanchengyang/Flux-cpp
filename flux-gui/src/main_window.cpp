@@ -4,6 +4,7 @@
 #include "views/extract_view.h"
 #include "views/browse_view.h"
 #include "views/browse_page.h"
+#include "views/settings_page.h"
 
 #include <QApplication>
 #include <QGuiApplication>
@@ -68,24 +69,7 @@ public:
     }
 };
 
-// BrowsePage 现在在单独的文件中定义
-
-class SettingsPage : public QWidget {
-    Q_OBJECT
-public:
-    SettingsPage(QWidget* parent = nullptr) : QWidget(parent) {
-        auto layout = new QVBoxLayout(this);
-        auto label = new QLabel("⚙️ Settings", this);
-        label->setAlignment(Qt::AlignCenter);
-        label->setStyleSheet("font-size: 24px; font-weight: bold; color: #9b59b6; margin: 50px;");
-        layout->addWidget(label);
-        
-        auto descLabel = new QLabel("Application settings and preferences\nThemes, language, performance options", this);
-        descLabel->setAlignment(Qt::AlignCenter);
-        descLabel->setStyleSheet("font-size: 16px; color: #7f8c8d; margin: 20px;");
-        layout->addWidget(descLabel);
-    }
-};
+// BrowsePage and SettingsPage are now defined in separate files
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

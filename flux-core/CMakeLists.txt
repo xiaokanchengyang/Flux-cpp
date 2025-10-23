@@ -13,13 +13,13 @@ target_sources(flux-core PRIVATE
     src/archive_utils.cpp
     src/format_detector.cpp
     
-    # Specific format implementations
-    src/formats/zip_packer.cpp
-    src/formats/zip_extractor.cpp
-    src/formats/tar_packer.cpp
-    src/formats/tar_extractor.cpp
-    src/formats/sevenzip_packer.cpp
-    src/formats/sevenzip_extractor.cpp
+    # Format implementations (real implementations)
+    src/formats/zip_packer_impl.cpp
+    src/formats/zip_extractor_impl.cpp
+    src/formats/tar_packer_impl.cpp
+    src/formats/tar_extractor_impl.cpp
+    src/formats/sevenzip_packer_impl.cpp
+    src/formats/sevenzip_extractor_impl.cpp
 )
 
 # Specify public include directories
@@ -54,15 +54,23 @@ elseif(UNIX)
     )
 endif()
 
-# Link third-party dependencies (commented out for initial build)
-# target_link_libraries(flux-core PRIVATE
-#     libzip::zip
-#     ZLIB::ZLIB
-#     LibLZMA::LibLZMA
-#     zstd::libzstd_shared
-#     fmt::fmt
-#     spdlog::spdlog
-# )
+# Link third-party dependencies
+find_package(PkgConfig REQUIRED)
+find_package(libzip CONFIG REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(LibLZMA REQUIRED)
+find_package(zstd CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+
+target_link_libraries(flux-core PRIVATE
+    libzip::zip
+    ZLIB::ZLIB
+    LibLZMA::LibLZMA
+    $<IF:$<TARGET_EXISTS:zstd::libzstd_shared>,zstd::libzstd_shared,zstd::libzstd_static>
+    fmt::fmt
+    spdlog::spdlog
+)
 
 # Platform-specific libraries
 if(WIN32)

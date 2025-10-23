@@ -8,8 +8,8 @@
 namespace Flux {
     namespace Formats {
         /**
-         * ZIP 格式解压器实现 (Stub Implementation)
-         * 这是一个临时实现，等待集成 libzip 库
+         * ZIP format extractor implementation (Stub Implementation)
+         * This is a temporary implementation, waiting for libzip library integration
          */
         class ZipExtractor : public Extractor {
         private:
@@ -30,23 +30,23 @@ namespace Flux {
                 result.total_size = 0;
                 
                 try {
-                    // 验证输入文件
+                    // Validate input file
                     if (!std::filesystem::exists(archive_path)) {
                         result.error_message = "Archive file not found: " + archive_path.string();
                         return result;
                     }
                     
-                    // 创建输出目录
+                    // Create output directory
                     std::filesystem::create_directories(output_dir);
                     
-                    // 基本的 ZIP 文件验证
+                    // Basic ZIP file validation
                     std::ifstream file(archive_path, std::ios::binary);
                     if (!file.is_open()) {
                         result.error_message = "Cannot open archive file: " + archive_path.string();
                         return result;
                     }
                     
-                    // 检查 ZIP 文件头
+                    // Check ZIP file header
                     uint32_t signature;
                     file.read(reinterpret_cast<char*>(&signature), sizeof(signature));
                     if (signature != 0x04034b50) {
@@ -62,7 +62,7 @@ namespace Flux {
                         on_progress("Validating ZIP structure...", 0.5f, 0, 1);
                     }
                     
-                    // 目前只是验证文件格式，实际解压需要 libzip
+                    // Currently only validates file format, actual extraction requires libzip
                     result.error_message = "ZIP extraction requires libzip library (not yet integrated)";
                     
                     if (on_progress) {
@@ -103,7 +103,7 @@ namespace Flux {
                     throw FileNotFoundException(archive_path.string());
                 }
                 
-                // 基本的文件头验证
+                // Basic file header validation
                 std::ifstream file(archive_path, std::ios::binary);
                 if (!file.is_open()) {
                     throw FileNotFoundException(archive_path.string());
@@ -117,7 +117,7 @@ namespace Flux {
                 
                 file.close();
                 
-                // 需要 libzip 来解析 ZIP 内容
+                // Need libzip to parse ZIP content
                 throw UnsupportedFormatException("ZIP content listing requires libzip library (not yet integrated)");
             }
 
@@ -133,12 +133,12 @@ namespace Flux {
                 info.path = archive_path;
                 info.format = ArchiveFormat::ZIP;
                 info.compressed_size = std::filesystem::file_size(archive_path);
-                info.uncompressed_size = 0; // 需要解析 ZIP 结构来获取
-                info.file_count = 0;        // 需要解析 ZIP 结构来获取
-                info.is_encrypted = false;  // 需要解析 ZIP 结构来检测
+                info.uncompressed_size = 0; // Need to parse ZIP structure to get this
+                info.file_count = 0;        // Need to parse ZIP structure to get this
+                info.is_encrypted = false;  // Need to parse ZIP structure to detect this
                 info.creation_time = "Unknown";
                 
-                // 需要 libzip 来获取完整信息
+                // Need libzip to get complete information
                 throw UnsupportedFormatException("Full ZIP archive info requires libzip library (not yet integrated)");
             }
 
@@ -156,14 +156,14 @@ namespace Flux {
                         return {false, "Cannot open archive file"};
                     }
                     
-                    // 基本的文件头验证
+                    // Basic file header validation
                     uint32_t signature;
                     file.read(reinterpret_cast<char*>(&signature), sizeof(signature));
                     if (signature != 0x04034b50) {
                         return {false, "Invalid ZIP file signature"};
                     }
                     
-                    // 完整的完整性验证需要 libzip
+                    // Complete integrity verification requires libzip
                     return {false, "Full ZIP integrity verification requires libzip library (not yet integrated)"};
                     
                 } catch (const std::exception& e) {
@@ -187,5 +187,12 @@ namespace Flux {
         };
     }
 }
+
+
+
+
+
+
+
 
 

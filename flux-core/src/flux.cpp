@@ -11,8 +11,8 @@ namespace Flux {
             return;
         }
 
-        // 初始化第三方库
-        // TODO: 初始化 zstd, zlib, lzma 等压缩库
+        // Initialize third-party libraries
+        // TODO: Initialize compression libraries (zstd, zlib, lzma, etc.)
         
         std::cout << "Flux library initialized (version " << getVersion() << ")" << std::endl;
         g_initialized = true;
@@ -23,8 +23,8 @@ namespace Flux {
             return;
         }
 
-        // 清理第三方库资源
-        // TODO: 清理压缩库资源
+        // Cleanup third-party library resources
+        // TODO: Cleanup compression library resources
         
         std::cout << "Flux library cleaned up" << std::endl;
         g_initialized = false;

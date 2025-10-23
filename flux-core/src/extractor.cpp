@@ -9,21 +9,30 @@
 
 // Forward declarations for format implementation classes
 namespace Flux::Formats {
-    class ZipExtractor;
-    class TarExtractor;
-    class SevenZipExtractor;
+    std::unique_ptr<Extractor> createZipExtractor();
+    std::unique_ptr<Extractor> createTarExtractor();
+    std::unique_ptr<Extractor> createSevenZipExtractor();
 }
 
 // Note: Format implementations should be linked separately, not included as .cpp files
 // This is a temporary solution until proper library structure is implemented
 
 namespace Flux {
-    // Factory function implementation - temporary stub until format implementations are complete
+    // Factory function implementation
     std::unique_ptr<Extractor> createExtractor(ArchiveFormat format) {
-        // TODO: Implement actual format-specific extractors
-        // For now, throw an exception to indicate incomplete implementation
-        throw UnsupportedFormatException(std::format("Extractor implementation not yet available: {}", 
-                                                    formatToString(format)));
+        switch (format) {
+            case ArchiveFormat::ZIP:
+                return Formats::createZipExtractor();
+            case ArchiveFormat::TAR_GZ:
+            case ArchiveFormat::TAR_XZ:
+            case ArchiveFormat::TAR_ZSTD:
+                return Formats::createTarExtractor();
+            case ArchiveFormat::SEVEN_ZIP:
+                return Formats::createSevenZipExtractor();
+            default:
+                throw UnsupportedFormatException(std::format("Unsupported format: {}", 
+                                                            formatToString(format)));
+        }
     }
 
     Flux::expected<std::unique_ptr<Extractor>, std::string> createExtractorAuto(

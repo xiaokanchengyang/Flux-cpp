@@ -7,8 +7,7 @@
 // #include <zlib.h>
 // #include <lzma.h>
 // #include <zstd.h>
-// TODO: Add spdlog dependency
-// #include <spdlog/spdlog.h>
+#include <spdlog/spdlog.h>
 // #include <fmt/format.h>
 
 namespace Flux {

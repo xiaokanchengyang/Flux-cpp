@@ -1,23 +1,133 @@
-<!DOCTYPE RCC>
-<RCC version="1.0">
-    <qresource>
-        <!-- 图标资源 -->
-        <file alias="icons/flux.png">icons/flux.png</file>
-        <file alias="icons/new.png">icons/new.png</file>
-        <file alias="icons/open.png">icons/open.png</file>
-        <file alias="icons/extract.png">icons/extract.png</file>
-        <file alias="icons/home.png">icons/home.png</file>
-        <file alias="icons/folder.png">icons/folder.png</file>
-        <file alias="icons/file.png">icons/file.png</file>
-        <file alias="icons/archive.png">icons/archive.png</file>
-        <file alias="icons/image.png">icons/image.png</file>
-        <file alias="icons/document.png">icons/document.png</file>
-        <file alias="icons/code.png">icons/code.png</file>
-        <file alias="icons/audio.png">icons/audio.png</file>
-        <file alias="icons/video.png">icons/video.png</file>
+<?xml version="1.0" encoding="UTF-8"?>
+<RCC>
+    <!-- Application Icons -->
+    <qresource prefix="/icons">
+        <!-- Main application icons -->
+        <file>icons/flux-logo.png</file>
+        <file>icons/flux-logo.svg</file>
+        <file>icons/flux-icon-16.png</file>
+        <file>icons/flux-icon-32.png</file>
+        <file>icons/flux-icon-48.png</file>
+        <file>icons/flux-icon-64.png</file>
+        <file>icons/flux-icon-128.png</file>
+        <file>icons/flux-icon-256.png</file>
         
-        <!-- 样式表资源 -->
-        <file alias="theme.qss">theme.qss</file>
+        <!-- Action icons -->
+        <file>icons/add.svg</file>
+        <file>icons/extract.svg</file>
+        <file>icons/compress.svg</file>
+        <file>icons/delete.svg</file>
+        <file>icons/refresh.svg</file>
+        <file>icons/settings.svg</file>
+        <file>icons/about.svg</file>
+        <file>icons/help.svg</file>
+        <file>icons/exit.svg</file>
+        
+        <!-- Navigation icons -->
+        <file>icons/back.svg</file>
+        <file>icons/forward.svg</file>
+        <file>icons/up.svg</file>
+        <file>icons/home.svg</file>
+        <file>icons/folder.svg</file>
+        <file>icons/folder-open.svg</file>
+        
+        <!-- File type icons -->
+        <file>icons/file-archive.svg</file>
+        <file>icons/file-zip.svg</file>
+        <file>icons/file-rar.svg</file>
+        <file>icons/file-7z.svg</file>
+        <file>icons/file-tar.svg</file>
+        <file>icons/file-gz.svg</file>
+        <file>icons/file-bz2.svg</file>
+        <file>icons/file-xz.svg</file>
+        <file>icons/file-document.svg</file>
+        <file>icons/file-image.svg</file>
+        <file>icons/file-audio.svg</file>
+        <file>icons/file-video.svg</file>
+        <file>icons/file-code.svg</file>
+        <file>icons/file-generic.svg</file>
+        
+        <!-- UI icons -->
+        <file>icons/arrow-down.svg</file>
+        <file>icons/arrow-up.svg</file>
+        <file>icons/arrow-left.svg</file>
+        <file>icons/arrow-right.svg</file>
+        <file>icons/check.svg</file>
+        <file>icons/close.svg</file>
+        <file>icons/minimize.svg</file>
+        <file>icons/maximize.svg</file>
+        <file>icons/restore.svg</file>
+        
+        <!-- Status icons -->
+        <file>icons/success.svg</file>
+        <file>icons/warning.svg</file>
+        <file>icons/error.svg</file>
+        <file>icons/info.svg</file>
+        <file>icons/loading.svg</file>
+        
+        <!-- Tree view icons -->
+        <file>icons/branch-line.png</file>
+        <file>icons/branch-more.png</file>
+        <file>icons/branch-end.png</file>
+        <file>icons/branch-closed.png</file>
+        <file>icons/branch-open.png</file>
+        
+        <!-- Light theme variants -->
+        <file>icons/arrow-down-light.png</file>
+        <file>icons/check-light.png</file>
+    </qresource>
+    
+    <!-- Application Images -->
+    <qresource prefix="/images">
+        <file>images/splash.png</file>
+        <file>images/logo-banner.png</file>
+        <file>images/background-pattern.png</file>
+        <file>images/empty-state.svg</file>
+        <file>images/welcome-hero.svg</file>
+    </qresource>
+    
+    <!-- Themes -->
+    <qresource prefix="/themes">
+        <file>themes/dark.qss</file>
+        <file>themes/light.qss</file>
+    </qresource>
+    
+    <!-- Fonts -->
+    <qresource prefix="/fonts">
+        <file>fonts/Inter-Regular.ttf</file>
+        <file>fonts/Inter-Medium.ttf</file>
+        <file>fonts/Inter-SemiBold.ttf</file>
+        <file>fonts/Inter-Bold.ttf</file>
+    </qresource>
+    
+    <!-- Translations -->
+    <qresource prefix="/translations">
+        <file>translations/flux_en.qm</file>
+        <file>translations/flux_zh_CN.qm</file>
+        <file>translations/flux_zh_TW.qm</file>
+        <file>translations/flux_ja.qm</file>
+        <file>translations/flux_ko.qm</file>
+        <file>translations/flux_fr.qm</file>
+        <file>translations/flux_de.qm</file>
+        <file>translations/flux_es.qm</file>
+        <file>translations/flux_ru.qm</file>
+        <file>translations/flux_pt.qm</file>
+        <file>translations/flux_it.qm</file>
+    </qresource>
+    
+    <!-- Configuration Templates -->
+    <qresource prefix="/config">
+        <file>config/default-settings.json</file>
+        <file>config/mime-types.json</file>
+        <file>config/compression-presets.json</file>
+    </qresource>
+    
+    <!-- Documentation -->
+    <qresource prefix="/docs">
+        <file>docs/user-guide.html</file>
+        <file>docs/keyboard-shortcuts.html</file>
+        <file>docs/supported-formats.html</file>
+        <file>docs/changelog.html</file>
+        <file>docs/license.txt</file>
     </qresource>
 </RCC>
-

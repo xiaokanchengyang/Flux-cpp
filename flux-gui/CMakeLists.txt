@@ -1,5 +1,6 @@
 # Flux-GUI Graphical User Interface Application
 cmake_minimum_required(VERSION 3.22)
+project(FluxGUI VERSION 1.0.0 LANGUAGES CXX)
 
 # Find Qt6 components
 find_package(Qt6 REQUIRED COMPONENTS 
@@ -13,30 +14,66 @@ find_package(Qt6 REQUIRED COMPONENTS
 # Create executable
 add_executable(flux-gui
     src/main.cpp
-    src/main_window.cpp
-    src/main_window.h
     
-    # View components
-    src/views/welcome_view.cpp
-    src/views/welcome_view.h
-    src/views/pack_view.cpp
-    src/views/pack_view.h
-    src/views/extract_view.cpp
-    src/views/extract_view.h
-    src/views/browse_view.cpp
-    src/views/browse_view.h
-    src/views/browse_page.cpp
-    src/views/browse_page.h
+    # Main UI components
+    src/ui/main_window.cpp
+    src/ui/main_window.h
+    
+    # Core systems
+    src/core/theme/theme_manager.cpp
+    src/core/theme/theme_manager.h
+    src/core/config/settings_manager.cpp
+    src/core/config/settings_manager.h
+    src/core/archive/archive_manager.cpp
+    src/core/archive/archive_manager.h
+    
+    # Modern UI widgets
+    src/ui/widgets/welcome_widget.cpp
+    src/ui/widgets/welcome_widget.h
+    src/ui/widgets/archive_explorer_widget.cpp
+    src/ui/widgets/archive_explorer_widget.h
+    src/ui/widgets/compression_widget.cpp
+    src/ui/widgets/compression_widget.h
+    src/ui/widgets/extraction_widget.cpp
+    src/ui/widgets/extraction_widget.h
+    src/ui/widgets/settings_widget.cpp
+    src/ui/widgets/settings_widget.h
+    src/ui/widgets/progress_widget.cpp
+    src/ui/widgets/progress_widget.h
+    
+    # UI components
+    src/ui/components/modern_toolbar.cpp
+    src/ui/components/modern_toolbar.h
+    src/ui/components/status_bar.cpp
+    src/ui/components/status_bar.h
+    src/ui/components/file_tree_view.cpp
+    src/ui/components/file_tree_view.h
+    src/ui/components/archive_info_panel.cpp
+    src/ui/components/archive_info_panel.h
+    
+    # Platform integration
+    src/platform/system_integration.cpp
+    src/platform/system_integration.h
     
     # Utility classes
     src/utils/file_utils.cpp
     src/utils/file_utils.h
     src/utils/resource_manager.cpp
     src/utils/resource_manager.h
+    src/utils/ui_utils.cpp
+    src/utils/ui_utils.h
     
     # Model classes
     src/models/archive_model.cpp
     src/models/archive_model.h
+    src/models/file_system_model.cpp
+    src/models/file_system_model.h
+    
+    # Dialogs
+    src/ui/dialogs/about_dialog.cpp
+    src/ui/dialogs/about_dialog.h
+    src/ui/dialogs/preferences_dialog.cpp
+    src/ui/dialogs/preferences_dialog.h
     
     # Resource files
     resources/resources.qrc

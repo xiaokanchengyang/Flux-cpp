@@ -1,0 +1,208 @@
+{
+  "application": {
+    "version": "2.0.0",
+    "firstRun": true,
+    "language": "en",
+    "theme": "dark",
+    "checkForUpdates": true,
+    "autoStart": false,
+    "minimizeToTray": true,
+    "closeToTray": false,
+    "startMinimized": false
+  },
+  "ui": {
+    "theme": {
+      "current": "dark",
+      "accentColor": "#BB86FC",
+      "customFont": "",
+      "fontSize": 14,
+      "uiScale": 1.0,
+      "animations": true,
+      "transparency": true,
+      "iconTheme": "modern"
+    },
+    "mainWindow": {
+      "width": 1200,
+      "height": 800,
+      "maximized": false,
+      "position": {
+        "x": -1,
+        "y": -1
+      },
+      "splitterSizes": [300, 900],
+      "toolbarVisible": true,
+      "statusBarVisible": true,
+      "sidebarVisible": true
+    },
+    "fileList": {
+      "viewMode": "details",
+      "sortColumn": 0,
+      "sortOrder": "ascending",
+      "showHiddenFiles": false,
+      "alternatingRowColors": true,
+      "iconSize": 16
+    }
+  },
+  "compression": {
+    "defaultFormat": "zip",
+    "defaultLevel": 6,
+    "solidArchive": false,
+    "compressHeaders": true,
+    "dictionarySize": 32,
+    "threadCount": 0,
+    "deleteAfterCompression": false,
+    "createSubfolder": true,
+    "defaultPassword": "",
+    "rememberPasswords": false,
+    "passwordTimeout": 300,
+    "presets": [
+      {
+        "name": "Fast Compression",
+        "format": "zip",
+        "level": 1,
+        "description": "Quick compression with larger file size"
+      },
+      {
+        "name": "Balanced",
+        "format": "zip",
+        "level": 6,
+        "description": "Good balance between speed and compression"
+      },
+      {
+        "name": "Maximum Compression",
+        "format": "7z",
+        "level": 9,
+        "description": "Best compression ratio, slower speed"
+      }
+    ]
+  },
+  "extraction": {
+    "defaultDirectory": "",
+    "overwriteMode": "ask",
+    "preservePaths": true,
+    "createSubfolder": true,
+    "openAfterExtraction": false,
+    "deleteAfterExtraction": false,
+    "verifyExtractedFiles": true,
+    "skipBrokenFiles": false
+  },
+  "integration": {
+    "contextMenu": true,
+    "fileAssociations": true,
+    "systemTray": true,
+    "contextActions": [
+      "extract_here",
+      "extract_to_folder",
+      "add_to_archive",
+      "compress_and_email"
+    ],
+    "supportedFormats": [
+      "zip", "7z", "rar", "tar", "gz", "bz2", "xz", "lzma",
+      "cab", "iso", "dmg", "deb", "rpm", "msi"
+    ]
+  },
+  "performance": {
+    "memoryCacheSize": 256,
+    "maxConcurrentOperations": 4,
+    "enableMultithreading": true,
+    "cpuUsageLimit": 80,
+    "enableLogging": true,
+    "logLevel": "info",
+    "maxLogFileSize": 10,
+    "keepLogDays": 30
+  },
+  "security": {
+    "rememberPasswords": false,
+    "passwordTimeout": 300,
+    "secureDelete": false,
+    "encryptTempFiles": false,
+    "sendUsageStats": false,
+    "autoUpdate": true,
+    "checkSignatures": true
+  },
+  "advanced": {
+    "debugMode": false,
+    "verboseLogging": false,
+    "customTempDir": "",
+    "customArguments": "",
+    "enableExperimentalFeatures": false,
+    "maxRecentFiles": 10,
+    "backupSettings": true
+  },
+  "paths": {
+    "defaultDirectory": "",
+    "recentDirectories": [],
+    "recentFiles": [],
+    "bookmarks": [
+      {
+        "name": "Desktop",
+        "path": "~/Desktop"
+      },
+      {
+        "name": "Documents",
+        "path": "~/Documents"
+      },
+      {
+        "name": "Downloads",
+        "path": "~/Downloads"
+      }
+    ]
+  },
+  "formats": {
+    "zip": {
+      "enabled": true,
+      "defaultLevel": 6,
+      "supportedLevels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "extensions": [".zip", ".jar", ".war", ".ear"]
+    },
+    "7z": {
+      "enabled": true,
+      "defaultLevel": 7,
+      "supportedLevels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "extensions": [".7z"]
+    },
+    "rar": {
+      "enabled": true,
+      "extractOnly": true,
+      "extensions": [".rar", ".r00", ".r01"]
+    },
+    "tar": {
+      "enabled": true,
+      "defaultLevel": 6,
+      "extensions": [".tar", ".tar.gz", ".tgz", ".tar.bz2", ".tbz2", ".tar.xz", ".txz"]
+    },
+    "gz": {
+      "enabled": true,
+      "defaultLevel": 6,
+      "extensions": [".gz"]
+    },
+    "bz2": {
+      "enabled": true,
+      "defaultLevel": 9,
+      "extensions": [".bz2"]
+    },
+    "xz": {
+      "enabled": true,
+      "defaultLevel": 6,
+      "extensions": [".xz"]
+    }
+  },
+  "shortcuts": {
+    "newArchive": "Ctrl+N",
+    "openArchive": "Ctrl+O",
+    "extractAll": "Ctrl+E",
+    "extractHere": "Ctrl+Shift+E",
+    "addFiles": "Ctrl+A",
+    "deleteFiles": "Delete",
+    "refresh": "F5",
+    "settings": "Ctrl+,",
+    "about": "F1",
+    "quit": "Ctrl+Q",
+    "selectAll": "Ctrl+A",
+    "copy": "Ctrl+C",
+    "paste": "Ctrl+V",
+    "cut": "Ctrl+X",
+    "undo": "Ctrl+Z",
+    "redo": "Ctrl+Y"
+  }
+}

@@ -1,0 +1,267 @@
+{
+  "mimeTypes": {
+    "application/zip": {
+      "extensions": [".zip", ".jar", ".war", ".ear", ".apk", ".xpi"],
+      "icon": "file-zip",
+      "description": "ZIP Archive",
+      "canCreate": true,
+      "canExtract": true,
+      "defaultLevel": 6,
+      "supportedLevels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    },
+    "application/x-7z-compressed": {
+      "extensions": [".7z"],
+      "icon": "file-7z",
+      "description": "7-Zip Archive",
+      "canCreate": true,
+      "canExtract": true,
+      "defaultLevel": 7,
+      "supportedLevels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    },
+    "application/vnd.rar": {
+      "extensions": [".rar", ".r00", ".r01", ".r02", ".r03", ".r04", ".r05"],
+      "icon": "file-rar",
+      "description": "RAR Archive",
+      "canCreate": false,
+      "canExtract": true,
+      "extractOnly": true
+    },
+    "application/x-tar": {
+      "extensions": [".tar"],
+      "icon": "file-tar",
+      "description": "TAR Archive",
+      "canCreate": true,
+      "canExtract": true,
+      "defaultLevel": 0
+    },
+    "application/gzip": {
+      "extensions": [".gz", ".tar.gz", ".tgz"],
+      "icon": "file-gz",
+      "description": "GZIP Archive",
+      "canCreate": true,
+      "canExtract": true,
+      "defaultLevel": 6,
+      "supportedLevels": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    },
+    "application/x-bzip2": {
+      "extensions": [".bz2", ".tar.bz2", ".tbz2", ".tbz"],
+      "icon": "file-bz2",
+      "description": "BZIP2 Archive",
+      "canCreate": true,
+      "canExtract": true,
+      "defaultLevel": 9,
+      "supportedLevels": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    },
+    "application/x-xz": {
+      "extensions": [".xz", ".tar.xz", ".txz"],
+      "icon": "file-xz",
+      "description": "XZ Archive",
+      "canCreate": true,
+      "canExtract": true,
+      "defaultLevel": 6,
+      "supportedLevels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    },
+    "application/x-lzma": {
+      "extensions": [".lzma", ".tar.lzma", ".tlz"],
+      "icon": "file-archive",
+      "description": "LZMA Archive",
+      "canCreate": true,
+      "canExtract": true,
+      "defaultLevel": 6
+    },
+    "application/vnd.ms-cab-compressed": {
+      "extensions": [".cab"],
+      "icon": "file-archive",
+      "description": "Cabinet Archive",
+      "canCreate": false,
+      "canExtract": true,
+      "extractOnly": true
+    },
+    "application/x-iso9660-image": {
+      "extensions": [".iso"],
+      "icon": "file-archive",
+      "description": "ISO Disk Image",
+      "canCreate": false,
+      "canExtract": true,
+      "extractOnly": true
+    },
+    "application/x-apple-diskimage": {
+      "extensions": [".dmg"],
+      "icon": "file-archive",
+      "description": "Apple Disk Image",
+      "canCreate": false,
+      "canExtract": true,
+      "extractOnly": true
+    },
+    "application/vnd.debian.binary-package": {
+      "extensions": [".deb"],
+      "icon": "file-archive",
+      "description": "Debian Package",
+      "canCreate": false,
+      "canExtract": true,
+      "extractOnly": true
+    },
+    "application/x-rpm": {
+      "extensions": [".rpm"],
+      "icon": "file-archive",
+      "description": "RPM Package",
+      "canCreate": false,
+      "canExtract": true,
+      "extractOnly": true
+    },
+    "application/x-msi": {
+      "extensions": [".msi"],
+      "icon": "file-archive",
+      "description": "Windows Installer Package",
+      "canCreate": false,
+      "canExtract": true,
+      "extractOnly": true
+    },
+    "application/x-ace": {
+      "extensions": [".ace"],
+      "icon": "file-archive",
+      "description": "ACE Archive",
+      "canCreate": false,
+      "canExtract": true,
+      "extractOnly": true
+    },
+    "application/x-arj": {
+      "extensions": [".arj"],
+      "icon": "file-archive",
+      "description": "ARJ Archive",
+      "canCreate": false,
+      "canExtract": true,
+      "extractOnly": true
+    },
+    "application/x-lzh": {
+      "extensions": [".lzh", ".lha"],
+      "icon": "file-archive",
+      "description": "LZH Archive",
+      "canCreate": false,
+      "canExtract": true,
+      "extractOnly": true
+    },
+    "application/x-compress": {
+      "extensions": [".Z", ".tar.Z"],
+      "icon": "file-archive",
+      "description": "Compress Archive",
+      "canCreate": false,
+      "canExtract": true,
+      "extractOnly": true
+    }
+  },
+  "fileTypes": {
+    "document": {
+      "extensions": [".txt", ".doc", ".docx", ".pdf", ".rtf", ".odt"],
+      "icon": "file-document",
+      "description": "Document"
+    },
+    "image": {
+      "extensions": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".svg", ".webp"],
+      "icon": "file-image",
+      "description": "Image"
+    },
+    "audio": {
+      "extensions": [".mp3", ".wav", ".flac", ".ogg", ".aac", ".m4a", ".wma"],
+      "icon": "file-audio",
+      "description": "Audio"
+    },
+    "video": {
+      "extensions": [".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm"],
+      "icon": "file-video",
+      "description": "Video"
+    },
+    "code": {
+      "extensions": [".cpp", ".h", ".c", ".py", ".js", ".html", ".css", ".java", ".cs"],
+      "icon": "file-code",
+      "description": "Source Code"
+    },
+    "executable": {
+      "extensions": [".exe", ".msi", ".app", ".deb", ".rpm", ".dmg"],
+      "icon": "file-archive",
+      "description": "Executable"
+    }
+  },
+  "contextMenuActions": {
+    "extract_here": {
+      "title": "Extract Here",
+      "description": "Extract archive contents to current directory",
+      "icon": "extract",
+      "shortcut": "Ctrl+Shift+E"
+    },
+    "extract_to_folder": {
+      "title": "Extract to Folder...",
+      "description": "Extract archive contents to a specific folder",
+      "icon": "extract",
+      "shortcut": "Ctrl+E"
+    },
+    "add_to_archive": {
+      "title": "Add to Archive...",
+      "description": "Create a new archive with selected files",
+      "icon": "compress",
+      "shortcut": "Ctrl+A"
+    },
+    "compress_and_email": {
+      "title": "Compress and Email",
+      "description": "Create archive and attach to email",
+      "icon": "compress",
+      "shortcut": ""
+    },
+    "test_archive": {
+      "title": "Test Archive",
+      "description": "Verify archive integrity",
+      "icon": "check",
+      "shortcut": ""
+    },
+    "view_archive": {
+      "title": "View Archive",
+      "description": "Browse archive contents",
+      "icon": "folder-open",
+      "shortcut": "Ctrl+O"
+    }
+  },
+  "compressionPresets": {
+    "store": {
+      "name": "Store (No Compression)",
+      "description": "Store files without compression",
+      "level": 0,
+      "format": "zip",
+      "speed": "fastest",
+      "ratio": "none"
+    },
+    "fast": {
+      "name": "Fast Compression",
+      "description": "Quick compression with larger file size",
+      "level": 1,
+      "format": "zip",
+      "speed": "fast",
+      "ratio": "low"
+    },
+    "normal": {
+      "name": "Normal Compression",
+      "description": "Good balance between speed and compression",
+      "level": 6,
+      "format": "zip",
+      "speed": "normal",
+      "ratio": "medium"
+    },
+    "maximum": {
+      "name": "Maximum Compression",
+      "description": "Best compression ratio, slower speed",
+      "level": 9,
+      "format": "7z",
+      "speed": "slow",
+      "ratio": "high"
+    },
+    "ultra": {
+      "name": "Ultra Compression",
+      "description": "Maximum compression with LZMA2",
+      "level": 9,
+      "format": "7z",
+      "method": "LZMA2",
+      "dictionarySize": 64,
+      "speed": "slowest",
+      "ratio": "maximum"
+    }
+  }
+}

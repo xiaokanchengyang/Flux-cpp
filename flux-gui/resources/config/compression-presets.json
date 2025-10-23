@@ -1,0 +1,353 @@
+{
+  "presets": [
+    {
+      "id": "store",
+      "name": "Store (No Compression)",
+      "description": "Store files without compression - fastest but largest size",
+      "icon": "speed",
+      "format": "zip",
+      "level": 0,
+      "method": "store",
+      "dictionarySize": 0,
+      "wordSize": 0,
+      "solidArchive": false,
+      "compressHeaders": false,
+      "encryptHeaders": false,
+      "multithread": false,
+      "estimatedSpeed": "fastest",
+      "estimatedRatio": "none",
+      "recommendedFor": ["temporary", "already_compressed"]
+    },
+    {
+      "id": "fast",
+      "name": "Fast Compression",
+      "description": "Quick compression with reasonable file size reduction",
+      "icon": "fast-forward",
+      "format": "zip",
+      "level": 1,
+      "method": "deflate",
+      "dictionarySize": 32,
+      "wordSize": 32,
+      "solidArchive": false,
+      "compressHeaders": false,
+      "encryptHeaders": false,
+      "multithread": true,
+      "estimatedSpeed": "fast",
+      "estimatedRatio": "low",
+      "recommendedFor": ["large_files", "network_transfer"]
+    },
+    {
+      "id": "balanced",
+      "name": "Balanced",
+      "description": "Good balance between compression speed and file size",
+      "icon": "balance",
+      "format": "zip",
+      "level": 6,
+      "method": "deflate",
+      "dictionarySize": 32,
+      "wordSize": 32,
+      "solidArchive": false,
+      "compressHeaders": true,
+      "encryptHeaders": false,
+      "multithread": true,
+      "estimatedSpeed": "normal",
+      "estimatedRatio": "medium",
+      "recommendedFor": ["general_use", "email_attachments"]
+    },
+    {
+      "id": "high",
+      "name": "High Compression",
+      "description": "Better compression ratio with moderate speed",
+      "icon": "compress",
+      "format": "7z",
+      "level": 7,
+      "method": "LZMA2",
+      "dictionarySize": 32,
+      "wordSize": 64,
+      "solidArchive": true,
+      "compressHeaders": true,
+      "encryptHeaders": false,
+      "multithread": true,
+      "estimatedSpeed": "slow",
+      "estimatedRatio": "high",
+      "recommendedFor": ["archival", "storage"]
+    },
+    {
+      "id": "maximum",
+      "name": "Maximum Compression",
+      "description": "Best compression ratio - slowest but smallest size",
+      "icon": "compress-arrows",
+      "format": "7z",
+      "level": 9,
+      "method": "LZMA2",
+      "dictionarySize": 64,
+      "wordSize": 273,
+      "solidArchive": true,
+      "compressHeaders": true,
+      "encryptHeaders": false,
+      "multithread": true,
+      "estimatedSpeed": "slowest",
+      "estimatedRatio": "maximum",
+      "recommendedFor": ["long_term_storage", "bandwidth_limited"]
+    },
+    {
+      "id": "ultra",
+      "name": "Ultra Compression",
+      "description": "Experimental maximum compression with advanced settings",
+      "icon": "rocket",
+      "format": "7z",
+      "level": 9,
+      "method": "LZMA2",
+      "dictionarySize": 128,
+      "wordSize": 273,
+      "solidArchive": true,
+      "compressHeaders": true,
+      "encryptHeaders": false,
+      "multithread": true,
+      "passes": 15,
+      "fastBytes": 273,
+      "estimatedSpeed": "very_slow",
+      "estimatedRatio": "ultra",
+      "recommendedFor": ["competition", "extreme_storage_constraints"]
+    },
+    {
+      "id": "secure_fast",
+      "name": "Secure Fast",
+      "description": "Fast compression with AES-256 encryption",
+      "icon": "shield-fast",
+      "format": "7z",
+      "level": 3,
+      "method": "LZMA2",
+      "dictionarySize": 16,
+      "wordSize": 32,
+      "solidArchive": false,
+      "compressHeaders": true,
+      "encryptHeaders": true,
+      "encryption": "AES256",
+      "multithread": true,
+      "estimatedSpeed": "normal",
+      "estimatedRatio": "medium",
+      "recommendedFor": ["sensitive_data", "quick_encryption"]
+    },
+    {
+      "id": "secure_maximum",
+      "name": "Secure Maximum",
+      "description": "Maximum compression with AES-256 encryption",
+      "icon": "shield-lock",
+      "format": "7z",
+      "level": 9,
+      "method": "LZMA2",
+      "dictionarySize": 64,
+      "wordSize": 273,
+      "solidArchive": true,
+      "compressHeaders": true,
+      "encryptHeaders": true,
+      "encryption": "AES256",
+      "multithread": true,
+      "estimatedSpeed": "slow",
+      "estimatedRatio": "maximum",
+      "recommendedFor": ["confidential_archives", "secure_storage"]
+    },
+    {
+      "id": "multimedia",
+      "name": "Multimedia",
+      "description": "Optimized for images, videos, and audio files",
+      "icon": "photo",
+      "format": "zip",
+      "level": 1,
+      "method": "deflate",
+      "dictionarySize": 32,
+      "wordSize": 32,
+      "solidArchive": false,
+      "compressHeaders": false,
+      "encryptHeaders": false,
+      "multithread": true,
+      "skipCompressed": true,
+      "estimatedSpeed": "fast",
+      "estimatedRatio": "low",
+      "recommendedFor": ["photos", "videos", "music"]
+    },
+    {
+      "id": "documents",
+      "name": "Documents",
+      "description": "Optimized for text documents and office files",
+      "icon": "file-text",
+      "format": "7z",
+      "level": 7,
+      "method": "LZMA2",
+      "dictionarySize": 32,
+      "wordSize": 64,
+      "solidArchive": true,
+      "compressHeaders": true,
+      "encryptHeaders": false,
+      "multithread": true,
+      "estimatedSpeed": "normal",
+      "estimatedRatio": "high",
+      "recommendedFor": ["text_files", "office_documents", "pdfs"]
+    },
+    {
+      "id": "software",
+      "name": "Software Distribution",
+      "description": "Optimized for software packages and executables",
+      "icon": "package",
+      "format": "7z",
+      "level": 5,
+      "method": "LZMA2",
+      "dictionarySize": 32,
+      "wordSize": 64,
+      "solidArchive": false,
+      "compressHeaders": true,
+      "encryptHeaders": false,
+      "multithread": true,
+      "estimatedSpeed": "normal",
+      "estimatedRatio": "medium",
+      "recommendedFor": ["executables", "libraries", "installers"]
+    },
+    {
+      "id": "backup",
+      "name": "Backup",
+      "description": "Reliable compression for backup purposes",
+      "icon": "database",
+      "format": "7z",
+      "level": 6,
+      "method": "LZMA2",
+      "dictionarySize": 32,
+      "wordSize": 64,
+      "solidArchive": true,
+      "compressHeaders": true,
+      "encryptHeaders": false,
+      "multithread": true,
+      "testAfterCompression": true,
+      "estimatedSpeed": "normal",
+      "estimatedRatio": "high",
+      "recommendedFor": ["system_backup", "data_archival", "incremental_backup"]
+    }
+  ],
+  "formatSettings": {
+    "zip": {
+      "supportedMethods": ["store", "deflate"],
+      "supportedLevels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "defaultMethod": "deflate",
+      "defaultLevel": 6,
+      "supportsEncryption": true,
+      "encryptionMethods": ["ZipCrypto", "AES128", "AES192", "AES256"],
+      "defaultEncryption": "AES256",
+      "supportsMultithread": true,
+      "supportsSolidArchive": false
+    },
+    "7z": {
+      "supportedMethods": ["LZMA", "LZMA2", "PPMd", "BZip2", "Deflate", "Copy"],
+      "supportedLevels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "defaultMethod": "LZMA2",
+      "defaultLevel": 7,
+      "supportsEncryption": true,
+      "encryptionMethods": ["AES256"],
+      "defaultEncryption": "AES256",
+      "supportsMultithread": true,
+      "supportsSolidArchive": true,
+      "dictionarySizes": [64, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144],
+      "wordSizes": [8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 273]
+    },
+    "tar": {
+      "supportedMethods": ["store"],
+      "supportedLevels": [0],
+      "defaultMethod": "store",
+      "defaultLevel": 0,
+      "supportsEncryption": false,
+      "supportsMultithread": false,
+      "supportsSolidArchive": false,
+      "compressionFormats": ["gz", "bz2", "xz", "lzma"]
+    },
+    "gz": {
+      "supportedMethods": ["deflate"],
+      "supportedLevels": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "defaultMethod": "deflate",
+      "defaultLevel": 6,
+      "supportsEncryption": false,
+      "supportsMultithread": false,
+      "supportsSolidArchive": false
+    },
+    "bz2": {
+      "supportedMethods": ["bzip2"],
+      "supportedLevels": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "defaultMethod": "bzip2",
+      "defaultLevel": 9,
+      "supportsEncryption": false,
+      "supportsMultithread": true,
+      "supportsSolidArchive": false
+    },
+    "xz": {
+      "supportedMethods": ["LZMA2"],
+      "supportedLevels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "defaultMethod": "LZMA2",
+      "defaultLevel": 6,
+      "supportsEncryption": false,
+      "supportsMultithread": true,
+      "supportsSolidArchive": false
+    }
+  },
+  "speedEstimates": {
+    "fastest": {
+      "description": "Completes in seconds",
+      "icon": "zap",
+      "color": "#4CAF50"
+    },
+    "fast": {
+      "description": "Completes in under a minute",
+      "icon": "fast-forward",
+      "color": "#8BC34A"
+    },
+    "normal": {
+      "description": "Completes in a few minutes",
+      "icon": "clock",
+      "color": "#FFC107"
+    },
+    "slow": {
+      "description": "May take several minutes",
+      "icon": "hourglass",
+      "color": "#FF9800"
+    },
+    "slowest": {
+      "description": "May take 10+ minutes",
+      "icon": "turtle",
+      "color": "#F44336"
+    },
+    "very_slow": {
+      "description": "May take 30+ minutes",
+      "icon": "snail",
+      "color": "#9C27B0"
+    }
+  },
+  "ratioEstimates": {
+    "none": {
+      "description": "No size reduction",
+      "percentage": "0%",
+      "color": "#F44336"
+    },
+    "low": {
+      "description": "10-30% size reduction",
+      "percentage": "10-30%",
+      "color": "#FF9800"
+    },
+    "medium": {
+      "description": "30-60% size reduction",
+      "percentage": "30-60%",
+      "color": "#FFC107"
+    },
+    "high": {
+      "description": "60-80% size reduction",
+      "percentage": "60-80%",
+      "color": "#8BC34A"
+    },
+    "maximum": {
+      "description": "80-90% size reduction",
+      "percentage": "80-90%",
+      "color": "#4CAF50"
+    },
+    "ultra": {
+      "description": "90%+ size reduction",
+      "percentage": "90%+",
+      "color": "#2196F3"
+    }
+  }
+}

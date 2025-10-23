@@ -3,7 +3,7 @@
 #include <iostream>
 
 namespace Flux {
-    // 全局初始化标志
+    // Global initialization flag
     static bool g_initialized = false;
 
     void initialize() {

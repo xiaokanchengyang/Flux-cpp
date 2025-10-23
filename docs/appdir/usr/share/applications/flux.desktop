@@ -1,0 +1,40 @@
+[Desktop Entry]
+Type=Application
+Name=Flux Archive Manager
+GenericName=Archive Manager
+Comment=Modern cross-platform archive manager with intuitive interface
+Exec=flux-gui
+Icon=flux
+Categories=Utility;Archiving;FileManager;
+MimeType=application/zip;application/x-tar;application/x-7z-compressed;application/x-compressed-tar;application/x-bzip-compressed-tar;application/x-lzma-compressed-tar;application/x-xz-compressed-tar;application/gzip;application/x-bzip2;application/x-lzma;application/x-xz;
+Keywords=archive;compression;zip;tar;7z;extract;compress;decompress;unpack;pack;
+StartupNotify=true
+StartupWMClass=flux-gui
+Terminal=false
+Version=1.0
+
+# Localized names and comments
+Name[zh_CN]=Flux 归档管理器
+Comment[zh_CN]=现代跨平台归档管理器，界面直观易用
+GenericName[zh_CN]=归档管理器
+Keywords[zh_CN]=归档;压缩;zip;tar;7z;解压;压缩;解压缩;打包;
+
+Name[es]=Gestor de Archivos Flux
+Comment[es]=Gestor de archivos multiplataforma moderno con interfaz intuitiva
+GenericName[es]=Gestor de Archivos
+Keywords[es]=archivo;compresión;zip;tar;7z;extraer;comprimir;descomprimir;empaquetar;
+
+Name[fr]=Gestionnaire d'Archives Flux
+Comment[fr]=Gestionnaire d'archives multiplateforme moderne avec interface intuitive
+GenericName[fr]=Gestionnaire d'Archives
+Keywords[fr]=archive;compression;zip;tar;7z;extraire;comprimer;décompresser;empaqueter;
+
+Name[de]=Flux Archiv-Manager
+Comment[de]=Moderner plattformübergreifender Archiv-Manager mit intuitiver Benutzeroberfläche
+GenericName[de]=Archiv-Manager
+Keywords[de]=archiv;kompression;zip;tar;7z;extrahieren;komprimieren;dekomprimieren;packen;
+
+Name[ja]=Flux アーカイブマネージャー
+Comment[ja]=直感的なインターフェースを持つモダンなクロスプラットフォームアーカイブマネージャー
+GenericName[ja]=アーカイブマネージャー
+Keywords[ja]=アーカイブ;圧縮;zip;tar;7z;展開;圧縮;解凍;パック;

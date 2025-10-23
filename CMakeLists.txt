@@ -1,10 +1,25 @@
 cmake_minimum_required(VERSION 3.25)
+
+# Allow version to be overridden by CI/CD
+if(NOT DEFINED FLUX_VERSION)
+    set(FLUX_VERSION "1.0.0")
+endif()
+
 project(Flux 
-    VERSION 1.0.0
-    DESCRIPTION "Modern high-performance archive management tool"
-    HOMEPAGE_URL "https://github.com/flux-archive-manager/flux-cpp"
+    VERSION ${FLUX_VERSION}
+    DESCRIPTION "Modern high-performance cross-platform archive management tool"
+    HOMEPAGE_URL "https://github.com/xiaokanchengyang/Flux-cpp"
     LANGUAGES CXX
 )
+
+# --- Build Options ---
+option(FLUX_BUILD_TESTS "Build unit tests" ON)
+option(FLUX_BUILD_BENCHMARKS "Build benchmark suite" ON)
+option(FLUX_BUILD_GUI "Build GUI application" ON)
+option(FLUX_BUILD_CLI "Build CLI application" ON)
+option(FLUX_ENABLE_LTO "Enable Link Time Optimization" OFF)
+option(FLUX_STATIC_LINKING "Enable static linking where possible" OFF)
+option(FLUX_ENABLE_SANITIZERS "Enable address and undefined behavior sanitizers" OFF)
 
 # --- Global Settings ---
 set(CMAKE_CXX_STANDARD 23)  # Use C++23 for latest features and best practices
@@ -17,6 +32,9 @@ set(CMAKE_AUTOUIC ON)
 # Enable modern CMake features
 # Note: C++ modules scanning disabled for MinGW compatibility
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
+# Export compile commands for IDE integration
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # --- Cross-platform Configuration ---
 # Set default build type to Release if not specified
@@ -33,18 +51,51 @@ if(MSVC)
     add_compile_options(/MP)
     # Set warning level
     add_compile_options(/W4)
-    # Disable some unnecessary warnings
+    # Disable some unnecessary warnings for Qt compatibility
     add_compile_options(/wd4251 /wd4275)
     # Enable UTF-8 encoding
     add_compile_options(/utf-8)
+    # Enable security features
+    add_compile_options(/GS /guard:cf)
+    # Enable Link Time Code Generation if LTO is enabled
+    if(FLUX_ENABLE_LTO)
+        add_compile_options(/GL)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LTCG")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /LTCG")
+    endif()
 else()
     # GCC/Clang settings
     add_compile_options(-Wall -Wextra -Wpedantic)
+    # Additional security and quality warnings
+    add_compile_options(-Wformat=2 -Wconversion -Wsign-conversion)
+    add_compile_options(-Wnull-dereference -Wdouble-promotion)
+    
     # Enable colored output for GCC/Clang
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         add_compile_options(-fdiagnostics-color=always)
+        # GCC-specific optimizations
+        if(CMAKE_BUILD_TYPE STREQUAL "Release")
+            add_compile_options(-ffast-math -funroll-loops)
+        endif()
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options(-fcolor-diagnostics)
+    endif()
+    
+    # Enable Link Time Optimization if requested
+    if(FLUX_ENABLE_LTO)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    endif()
+    
+    # Enable sanitizers for debugging builds
+    if(FLUX_ENABLE_SANITIZERS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_options(-fsanitize=address -fsanitize=undefined)
+        add_link_options(-fsanitize=address -fsanitize=undefined)
+    endif()
+    
+    # Security hardening flags
+    add_compile_options(-fstack-protector-strong)
+    if(NOT APPLE)
+        add_compile_options(-D_FORTIFY_SOURCE=2)
     endif()
 endif()
 
@@ -105,13 +156,37 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 # --- Add Our Modules (Subprojects) ---
+# Always build the core library
 add_subdirectory(flux-core)
-add_subdirectory(flux-cli)
-add_subdirectory(flux-gui)
+
+# Conditionally build CLI application
+if(FLUX_BUILD_CLI)
+    add_subdirectory(flux-cli)
+endif()
+
+# Conditionally build GUI application
+if(FLUX_BUILD_GUI)
+    add_subdirectory(flux-gui)
+endif()
 
 # --- Enable Testing ---
-enable_testing()
-include(GoogleTest)
+if(FLUX_BUILD_TESTS)
+    enable_testing()
+    include(GoogleTest)
+    
+    # Add test subdirectory if it exists
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
+        add_subdirectory(tests)
+    endif()
+endif()
+
+# --- Enable Benchmarks ---
+if(FLUX_BUILD_BENCHMARKS)
+    # Add benchmark subdirectory if it exists
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/CMakeLists.txt")
+        add_subdirectory(benchmarks)
+    endif()
+endif()
 
 # --- Installation Configuration ---
 include(GNUInstallDirs)

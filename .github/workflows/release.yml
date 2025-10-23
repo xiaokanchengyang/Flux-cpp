@@ -3,86 +3,90 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'   # Triggers on version tags like v1.0.0
-  workflow_dispatch:  # Allow manual trigger
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        default: 'v0.1.0'
+
+env:
+  QT_VERSION: "6.5.4"
+  CMAKE_VERSION: "3.25"
 
 jobs:
   create-release:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
-      release_id: ${{ steps.create_release.outputs.id }}
+      version: ${{ steps.get_version.outputs.version }}
     steps:
+      - name: Get version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Flux ${{ github.ref }}
+          tag_name: ${{ steps.get_version.outputs.version }}
+          release_name: Flux Archive Manager ${{ steps.get_version.outputs.version }}
+          body: |
+            ## Flux Archive Manager ${{ steps.get_version.outputs.version }}
+            
+            ### Features
+            - Modern cross-platform archive management
+            - Support for ZIP, TAR, and 7Z formats
+            - Intuitive GUI and powerful CLI interface
+            - High-performance processing with progress tracking
+            
+            ### Downloads
+            - **Windows**: `flux-windows-x64.zip` - Extract and run `flux-gui.exe`
+            - **Linux**: `flux-linux-x86_64.tar.gz` - Extract and run `./flux-gui`
+            - **macOS**: `flux-macos-x64.tar.gz` - Extract and run `Flux.app`
+            
+            ### Installation
+            1. Download the appropriate package for your platform
+            2. Extract the archive
+            3. Run the executable or install the package
+            
+            ### System Requirements
+            - **Windows**: Windows 10 or later
+            - **Linux**: Ubuntu 20.04+ or equivalent
+            - **macOS**: macOS 10.15 (Catalina) or later
+            
+            ### What's New
+            - Initial release with core functionality
+            - Cross-platform GUI and CLI tools
+            - Modern C++23 codebase
+            - Comprehensive test suite
           draft: false
           prerelease: false
 
-  build-and-package:
+  build-release:
     needs: create-release
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
-            platform: linux
-            artifact_name: flux-linux-x64
-            bundle_command: |
-              # Create AppDir structure
-              mkdir -p appdir/usr/{bin,lib,share/applications,share/icons/hicolor/256x256/apps}
-              
-              # Copy executables
-              cp build/flux-gui/FluxGUI appdir/usr/bin/
-              cp build/flux-cli/flux-cli appdir/usr/bin/
-              
-              # Create desktop file
-              cat > appdir/usr/share/applications/flux.desktop << EOF
-              [Desktop Entry]
-              Type=Application
-              Name=Flux Archive Manager
-              Comment=Modern archive manager with GUI and CLI
-              Exec=FluxGUI
-              Icon=flux
-              Categories=Utility;Archiving;
-              EOF
-              
-              # Create AppImage (if appimagetool is available)
-              wget -q -O appimagetool https://github.com/AppImage/AppImageKit/releases/latest/download/appimagetool-x86_64.AppImage || true
-              chmod +x appimagetool || true
-              ./appimagetool appdir flux-linux-x64.AppImage || true
-              
-              # Create tar.gz fallback
-              tar -czf flux-linux-x64.tar.gz -C appdir .
-
+            artifact_name: flux-linux-x86_64
+            package_ext: tar.gz
           - os: windows-latest
-            platform: windows
             artifact_name: flux-windows-x64
-            bundle_command: |
-              # Use windeployqt to bundle Qt dependencies
-              windeployqt build/flux-gui/Release/FluxGUI.exe --dir flux-windows-bundle
-              cp build/flux-cli/Release/flux-cli.exe flux-windows-bundle/
-              
-              # Create ZIP package
-              powershell -Command "Compress-Archive -Path flux-windows-bundle/* -DestinationPath flux-windows-x64.zip"
-
+            package_ext: zip
           - os: macos-latest
-            platform: macos
             artifact_name: flux-macos-x64
-            bundle_command: |
-              # Use macdeployqt to create .app bundle
-              macdeployqt build/flux-gui/FluxGUI.app -dmg
-              mv build/flux-gui/FluxGUI.dmg flux-macos-x64.dmg
-              
-              # Also create CLI-only package
-              mkdir -p flux-cli-macos
-              cp build/flux-cli/flux-cli flux-cli-macos/
-              tar -czf flux-cli-macos-x64.tar.gz -C flux-cli-macos .
+            package_ext: tar.gz
 
     steps:
       - name: Checkout repository
@@ -90,97 +94,362 @@ jobs:
         with:
           submodules: recursive
 
+      # Cache Qt installation
+      - name: Cache Qt
+        id: cache-qt
+        uses: actions/cache@v4
+        with:
+          path: ../Qt
+          key: ${{ runner.os }}-Qt-${{ env.QT_VERSION }}-release
+          restore-keys: |
+            ${{ runner.os }}-Qt-${{ env.QT_VERSION }}-
+            ${{ runner.os }}-Qt-
+
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: "6.5.4"
-          cache: true
+          version: ${{ env.QT_VERSION }}
+          cache: ${{ steps.cache-qt.outputs.cache-hit }}
           modules: 'qtbase qttools qtsvg'
 
       - name: Setup CMake
         uses: jwlawson/actions-setup-cmake@v2
         with:
-          cmake-version: '3.25'
+          cmake-version: ${{ env.CMAKE_VERSION }}
 
-      - name: Install platform dependencies
+      # Platform-specific dependencies
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
         run: |
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            sudo apt-get update
-            sudo apt-get install -y build-essential ninja-build libgl1-mesa-dev \
-              libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
-              libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0 \
-              desktop-file-utils
-          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            # MSVC setup handled by runner
-            echo "Windows dependencies ready"
-          else
-            # macOS - Xcode command line tools should be available
-            echo "macOS dependencies ready"
-          fi
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            ninja-build \
+            libgl1-mesa-dev \
+            libxkbcommon-x11-0 \
+            libxcb-icccm4 \
+            libxcb-image0 \
+            libxcb-keysyms1 \
+            libxcb-randr0 \
+            libxcb-render-util0 \
+            libxcb-xinerama0 \
+            libxcb-xfixes0 \
+            file \
+            wget \
+            fuse \
+            desktop-file-utils
+
+      - name: Install Windows dependencies
+        if: runner.os == 'Windows'
+        run: |
+          choco install ninja nsis
 
       - name: Setup MSVC (Windows)
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
 
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install ninja create-dmg
+
+      # Build configuration
       - name: Configure CMake
         run: |
           cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=install \
+            -DFLUX_BUILD_TESTS=OFF \
+            -DFLUX_BUILD_BENCHMARKS=OFF \
+            -DFLUX_VERSION="${{ needs.create-release.outputs.version }}" \
             -G "Ninja"
 
       - name: Build project
         run: cmake --build build --config Release --parallel
 
-      - name: Run tests
+      - name: Install project
+        run: cmake --install build --config Release
+
+      # Create Linux AppImage and packages
+      - name: Create Linux packages
+        if: runner.os == 'Linux'
         run: |
-          cd build
-          ctest --output-on-failure --parallel 2 || true
+          # Create AppDir structure
+          mkdir -p AppDir/usr/{bin,lib,share/{applications,icons/hicolor/{256x256,128x128,64x64,32x32,16x16}/apps,metainfo}}
+          
+          # Copy binaries
+          cp install/bin/* AppDir/usr/bin/ 2>/dev/null || true
+          
+          # Copy libraries
+          cp -r install/lib/* AppDir/usr/lib/ 2>/dev/null || true
+          
+          # Create desktop file
+          cat > AppDir/usr/share/applications/flux.desktop << 'EOF'
+          [Desktop Entry]
+          Type=Application
+          Name=Flux Archive Manager
+          Comment=Modern cross-platform archive manager
+          Exec=flux-gui
+          Icon=flux
+          Categories=Utility;Archiving;FileManager;
+          MimeType=application/zip;application/x-tar;application/x-7z-compressed;application/x-compressed-tar;application/x-bzip-compressed-tar;application/x-lzma-compressed-tar;
+          Keywords=archive;compression;zip;tar;7z;extract;compress;
+          StartupNotify=true
+          EOF
+          
+          # Validate desktop file
+          desktop-file-validate AppDir/usr/share/applications/flux.desktop || true
+          
+          # Create metainfo file
+          cat > AppDir/usr/share/metainfo/flux.appdata.xml << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <component type="desktop-application">
+            <id>flux</id>
+            <metadata_license>MIT</metadata_license>
+            <project_license>MIT</project_license>
+            <name>Flux Archive Manager</name>
+            <summary>Modern cross-platform archive manager</summary>
+            <description>
+              <p>
+                Flux is a modern, cross-platform archive manager that supports multiple formats
+                including ZIP, TAR, and 7Z. It features an intuitive graphical interface and
+                powerful command-line tools for efficient archive management.
+              </p>
+            </description>
+            <categories>
+              <category>Utility</category>
+              <category>Archiving</category>
+            </categories>
+          </component>
+          EOF
+          
+          # Create AppRun script
+          cat > AppDir/AppRun << 'EOF'
+          #!/bin/bash
+          HERE="$(dirname "$(readlink -f "${0}")")"
+          export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
+          export QT_PLUGIN_PATH="${HERE}/usr/lib/qt6/plugins:${QT_PLUGIN_PATH}"
+          export XDG_DATA_DIRS="${HERE}/usr/share:${XDG_DATA_DIRS}"
+          cd "${HERE}/usr/bin"
+          exec "${HERE}/usr/bin/flux-gui" "$@"
+          EOF
+          chmod +x AppDir/AppRun
+          
+          # Create tarball
+          tar -czf flux-linux-x86_64.tar.gz -C AppDir .
+          
+          # Try to create AppImage (if tools are available)
+          if command -v linuxdeployqt >/dev/null 2>&1; then
+            linuxdeployqt AppDir/usr/share/applications/flux.desktop -appimage -no-translations || true
+            if [ -f "Flux_Archive_Manager-x86_64.AppImage" ]; then
+              mv "Flux_Archive_Manager-x86_64.AppImage" "flux-linux-x86_64.AppImage"
+            fi
+          fi
 
-      - name: Package with CPack
+      # Create Windows installer and portable package
+      - name: Create Windows packages
+        if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-          cd build
-          cmake --build . --target package
+          # Deploy Qt dependencies
+          if (Test-Path "install/bin/flux-gui.exe") {
+            windeployqt install/bin/flux-gui.exe --dir install/bin --no-translations --no-system-d3d-compiler --no-opengl-sw --no-quick-import
+          }
+          
+          # Create portable ZIP package
+          Compress-Archive -Path install/* -DestinationPath flux-windows-x64.zip -Force
+          
+          # Create NSIS installer script
+          $nsisScript = @'
+          !define APP_NAME "Flux Archive Manager"
+          !define APP_VERSION "${{ needs.create-release.outputs.version }}"
+          !define APP_PUBLISHER "Flux Project"
+          !define APP_URL "https://github.com/xiaokanchengyang/Flux-cpp"
+          !define APP_EXECUTABLE "flux-gui.exe"
+          
+          !include "MUI2.nsh"
+          
+          Name "${APP_NAME}"
+          OutFile "flux-windows-x64-installer.exe"
+          InstallDir "$PROGRAMFILES64\${APP_NAME}"
+          InstallDirRegKey HKLM "Software\${APP_NAME}" "InstallDir"
+          RequestExecutionLevel admin
+          
+          !define MUI_ABORTWARNING
+          !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
+          !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
+          
+          !insertmacro MUI_PAGE_WELCOME
+          !insertmacro MUI_PAGE_LICENSE "LICENSE"
+          !insertmacro MUI_PAGE_DIRECTORY
+          !insertmacro MUI_PAGE_INSTFILES
+          !insertmacro MUI_PAGE_FINISH
+          
+          !insertmacro MUI_UNPAGE_WELCOME
+          !insertmacro MUI_UNPAGE_CONFIRM
+          !insertmacro MUI_UNPAGE_INSTFILES
+          !insertmacro MUI_UNPAGE_FINISH
+          
+          !insertmacro MUI_LANGUAGE "English"
+          
+          Section "Main Application" SecMain
+            SetOutPath "$INSTDIR"
+            File /r "install\*"
+            
+            WriteRegStr HKLM "Software\${APP_NAME}" "InstallDir" "$INSTDIR"
+            WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayName" "${APP_NAME}"
+            WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "UninstallString" "$INSTDIR\Uninstall.exe"
+            WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "Publisher" "${APP_PUBLISHER}"
+            WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "URLInfoAbout" "${APP_URL}"
+            WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayVersion" "${APP_VERSION}"
+            WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "NoModify" 1
+            WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "NoRepair" 1
+            
+            CreateDirectory "$SMPROGRAMS\${APP_NAME}"
+            CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\bin\${APP_EXECUTABLE}"
+            CreateShortcut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\bin\${APP_EXECUTABLE}"
+            
+            WriteUninstaller "$INSTDIR\Uninstall.exe"
+          SectionEnd
+          
+          Section "Uninstall"
+            Delete "$INSTDIR\Uninstall.exe"
+            RMDir /r "$INSTDIR"
+            Delete "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk"
+            RMDir "$SMPROGRAMS\${APP_NAME}"
+            Delete "$DESKTOP\${APP_NAME}.lnk"
+            
+            DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
+            DeleteRegKey HKLM "Software\${APP_NAME}"
+          SectionEnd
+          '@
+          
+          # Write NSIS script
+          $nsisScript | Out-File -FilePath "installer.nsi" -Encoding UTF8
+          
+          # Create installer (if NSIS is available)
+          if (Get-Command "makensis" -ErrorAction SilentlyContinue) {
+            makensis installer.nsi
+          }
 
-      - name: Create platform-specific bundles
-        run: ${{ matrix.bundle_command }}
+      # Create macOS DMG
+      - name: Create macOS packages
+        if: runner.os == 'macOS'
+        run: |
+          # Create app bundle structure
+          mkdir -p "Flux.app/Contents/MacOS"
+          mkdir -p "Flux.app/Contents/Resources"
+          mkdir -p "Flux.app/Contents/Frameworks"
+          
+          # Copy executable
+          if [ -f "install/bin/flux-gui" ]; then
+            cp install/bin/flux-gui "Flux.app/Contents/MacOS/"
+          fi
+          
+          # Create Info.plist
+          cat > "Flux.app/Contents/Info.plist" << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleExecutable</key>
+            <string>flux-gui</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.flux.archivemanager</string>
+            <key>CFBundleName</key>
+            <string>Flux Archive Manager</string>
+            <key>CFBundleDisplayName</key>
+            <string>Flux</string>
+            <key>CFBundleVersion</key>
+            <string>${{ needs.create-release.outputs.version }}</string>
+            <key>CFBundleShortVersionString</key>
+            <string>${{ needs.create-release.outputs.version }}</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>LSMinimumSystemVersion</key>
+            <string>10.15</string>
+            <key>NSHighResolutionCapable</key>
+            <true/>
+            <key>CFBundleDocumentTypes</key>
+            <array>
+              <dict>
+                <key>CFBundleTypeExtensions</key>
+                <array>
+                  <string>zip</string>
+                  <string>tar</string>
+                  <string>7z</string>
+                </array>
+                <key>CFBundleTypeName</key>
+                <string>Archive</string>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+              </dict>
+            </array>
+          </dict>
+          </plist>
+          EOF
+          
+          # Deploy Qt dependencies
+          macdeployqt Flux.app || true
+          
+          # Create DMG
+          if command -v create-dmg >/dev/null 2>&1; then
+            create-dmg \
+              --volname "Flux Archive Manager" \
+              --volicon "Flux.app/Contents/Resources/flux.icns" \
+              --window-pos 200 120 \
+              --window-size 600 400 \
+              --icon-size 100 \
+              --icon "Flux.app" 175 190 \
+              --hide-extension "Flux.app" \
+              --app-drop-link 425 190 \
+              "flux-macos-x64.dmg" \
+              "Flux.app" || true
+          fi
+          
+          # Fallback: create tarball
+          tar -czf flux-macos-x64.tar.gz Flux.app
 
-      - name: Upload Linux AppImage
-        if: matrix.platform == 'linux'
+      # Upload release assets
+      - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./flux-linux-x64.AppImage
-          asset_name: flux-linux-x64.AppImage
+          asset_path: ./flux-${{ matrix.artifact_name }}.${{ matrix.package_ext }}
+          asset_name: flux-${{ matrix.artifact_name }}.${{ matrix.package_ext }}
+          asset_content_type: application/octet-stream
+
+      # Upload additional Windows installer
+      - name: Upload Windows Installer
+        if: runner.os == 'Windows'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./flux-windows-x64-installer.exe
+          asset_name: flux-windows-x64-installer.exe
           asset_content_type: application/octet-stream
         continue-on-error: true
 
-      - name: Upload Linux tar.gz
-        if: matrix.platform == 'linux'
+      # Upload Linux AppImage
+      - name: Upload Linux AppImage
+        if: runner.os == 'Linux'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./flux-linux-x64.tar.gz
-          asset_name: flux-linux-x64.tar.gz
-          asset_content_type: application/gzip
+          asset_path: ./flux-linux-x86_64.AppImage
+          asset_name: flux-linux-x86_64.AppImage
+          asset_content_type: application/octet-stream
+        continue-on-error: true
 
-      - name: Upload Windows ZIP
-        if: matrix.platform == 'windows'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./flux-windows-x64.zip
-          asset_name: flux-windows-x64.zip
-          asset_content_type: application/zip
-
+      # Upload macOS DMG
       - name: Upload macOS DMG
-        if: matrix.platform == 'macos'
+        if: runner.os == 'macOS'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -189,25 +458,4 @@ jobs:
           asset_path: ./flux-macos-x64.dmg
           asset_name: flux-macos-x64.dmg
           asset_content_type: application/octet-stream
-
-      - name: Upload macOS CLI tar.gz
-        if: matrix.platform == 'macos'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./flux-cli-macos-x64.tar.gz
-          asset_name: flux-cli-macos-x64.tar.gz
-          asset_content_type: application/gzip
-
-      - name: Upload CPack packages
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: build/Flux-*.zip
-          asset_name: flux-${{ matrix.platform }}-cpack.zip
-          asset_content_type: application/zip
         continue-on-error: true

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.flux.archivemanager</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  
+  <name>Flux Archive Manager</name>
+  <summary>Modern cross-platform archive manager</summary>
+  
+  <description>
+    <p>
+      Flux Archive Manager is a modern, cross-platform application designed for efficient 
+      archive management. It provides both an intuitive graphical interface and powerful 
+      command-line tools for handling various archive formats.
+    </p>
+    <p>Key features include:</p>
+    <ul>
+      <li>Support for multiple archive formats: ZIP, TAR, 7Z, and more</li>
+      <li>Intuitive drag-and-drop interface for easy file management</li>
+      <li>High-performance processing with real-time progress tracking</li>
+      <li>Cross-platform compatibility (Windows, Linux, macOS)</li>
+      <li>Command-line interface for automation and scripting</li>
+      <li>Modern C++23 codebase with robust error handling</li>
+      <li>Extensible plugin architecture for future format support</li>
+    </ul>
+    <p>
+      Whether you're a casual user looking to extract downloaded archives or a power user 
+      needing advanced archive manipulation capabilities, Flux provides the tools you need 
+      with a clean, modern interface.
+    </p>
+  </description>
+  
+  <launchable type="desktop-id">flux.desktop</launchable>
+  
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main application window showing archive contents</caption>
+      <image>https://raw.githubusercontent.com/xiaokanchengyang/Flux-cpp/main/docs/screenshots/main-window.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Archive creation dialog with format selection</caption>
+      <image>https://raw.githubusercontent.com/xiaokanchengyang/Flux-cpp/main/docs/screenshots/create-archive.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Progress tracking during archive operations</caption>
+      <image>https://raw.githubusercontent.com/xiaokanchengyang/Flux-cpp/main/docs/screenshots/progress-dialog.png</image>
+    </screenshot>
+  </screenshots>
+  
+  <url type="homepage">https://github.com/xiaokanchengyang/Flux-cpp</url>
+  <url type="bugtracker">https://github.com/xiaokanchengyang/Flux-cpp/issues</url>
+  <url type="help">https://github.com/xiaokanchengyang/Flux-cpp/wiki</url>
+  <url type="donation">https://github.com/sponsors/xiaokanchengyang</url>
+  <url type="vcs-browser">https://github.com/xiaokanchengyang/Flux-cpp</url>
+  
+  <provides>
+    <binary>flux-gui</binary>
+    <binary>flux-cli</binary>
+  </provides>
+  
+  <categories>
+    <category>Utility</category>
+    <category>Archiving</category>
+    <category>FileManager</category>
+  </categories>
+  
+  <keywords>
+    <keyword>archive</keyword>
+    <keyword>compression</keyword>
+    <keyword>zip</keyword>
+    <keyword>tar</keyword>
+    <keyword>7z</keyword>
+    <keyword>extract</keyword>
+    <keyword>compress</keyword>
+  </keywords>
+  
+  <content_rating type="oars-1.1" />
+  
+  <releases>
+    <release version="0.1.0" date="2024-10-23">
+      <description>
+        <p>Initial release of Flux Archive Manager</p>
+        <ul>
+          <li>Core archive management functionality</li>
+          <li>Support for ZIP, TAR, and 7Z formats</li>
+          <li>Cross-platform GUI and CLI applications</li>
+          <li>Modern C++23 codebase with comprehensive error handling</li>
+          <li>Automated CI/CD pipeline for continuous integration</li>
+          <li>Comprehensive test suite and benchmarking framework</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+  
+  <developer_name>Flux Project Contributors</developer_name>
+  <update_contact>xiaokanchengyang@users.noreply.github.com</update_contact>
+  
+  <!-- Localized metadata -->
+  <name xml:lang="zh_CN">Flux 归档管理器</name>
+  <summary xml:lang="zh_CN">现代跨平台归档管理器</summary>
+  
+  <name xml:lang="es">Gestor de Archivos Flux</name>
+  <summary xml:lang="es">Gestor de archivos multiplataforma moderno</summary>
+  
+  <name xml:lang="fr">Gestionnaire d'Archives Flux</name>
+  <summary xml:lang="fr">Gestionnaire d'archives multiplateforme moderne</summary>
+  
+  <name xml:lang="de">Flux Archiv-Manager</name>
+  <summary xml:lang="de">Moderner plattformübergreifender Archiv-Manager</summary>
+  
+  <name xml:lang="ja">Flux アーカイブマネージャー</name>
+  <summary xml:lang="ja">モダンなクロスプラットフォームアーカイブマネージャー</summary>
+</component>

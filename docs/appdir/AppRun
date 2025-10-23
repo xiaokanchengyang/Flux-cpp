@@ -1,0 +1,34 @@
+#!/bin/bash
+# AppRun script for Flux Archive Manager AppImage
+# This script sets up the environment and launches the application
+
+# Get the directory where this script is located
+HERE="$(dirname "$(readlink -f "${0}")")"
+
+# Set up library paths for Qt and system libraries
+export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
+
+# Set up Qt plugin paths
+export QT_PLUGIN_PATH="${HERE}/usr/lib/qt6/plugins:${HERE}/usr/plugins:${QT_PLUGIN_PATH}"
+
+# Set up Qt library paths
+export QT_QPA_PLATFORM_PLUGIN_PATH="${HERE}/usr/lib/qt6/plugins/platforms:${QT_QPA_PLATFORM_PLUGIN_PATH}"
+
+# Set up XDG data directories for desktop integration
+export XDG_DATA_DIRS="${HERE}/usr/share:${XDG_DATA_DIRS}"
+
+# Set up icon theme paths
+export XDG_DATA_HOME="${HERE}/usr/share"
+
+# Ensure the application can find its resources
+export FLUX_RESOURCE_PATH="${HERE}/usr/share/flux"
+
+# Set up locale paths
+export LOCPATH="${HERE}/usr/lib/locale:${LOCPATH}"
+
+# Change to the application directory
+cd "${HERE}/usr/bin" || exit 1
+
+# Launch the application with all provided arguments
+# Use exec to replace the shell process with the application
+exec "${HERE}/usr/bin/flux-gui" "$@"

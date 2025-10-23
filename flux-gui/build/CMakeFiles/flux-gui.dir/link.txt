@@ -1,3 +1,0 @@
-C:\Qt\Tools\CMake_64\bin\cmake.exe -E rm -f CMakeFiles\flux-gui.dir/objects.a
-"D:\Program Files (x86)\SKTOOL7.1\Marco\X86\bin\ar.exe" qc CMakeFiles\flux-gui.dir/objects.a @CMakeFiles\flux-gui.dir\objects1.rsp
-C:\Qt\Tools\mingw1310_64\bin\c++.exe -Wl,--whole-archive CMakeFiles\flux-gui.dir/objects.a -Wl,--no-whole-archive -o FluxGUI.exe -Wl,--out-implib,libFluxGUI.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\flux-gui.dir\linkLibs.rsp

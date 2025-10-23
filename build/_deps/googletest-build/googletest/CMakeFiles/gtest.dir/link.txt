@@ -1,2 +1,0 @@
-C:\Qt\Tools\mingw1310_64\bin\ar.exe qc ..\..\..\lib\libgtest.a CMakeFiles/gtest.dir/gtest_autogen/mocs_compilation.cpp.obj "CMakeFiles/gtest.dir/src/gtest-all.cc.obj"
-C:\Qt\Tools\mingw1310_64\bin\ranlib.exe ..\..\..\lib\libgtest.a

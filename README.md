@@ -1,23 +1,38 @@
 # Flux Archive Manager
 
-A modern, cross-platform archive management tool built with C++20 and Qt6.
+[![CI](https://github.com/xiaokanchengyang/Flux-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/xiaokanchengyang/Flux-cpp/actions/workflows/ci.yml)
+[![Release](https://github.com/xiaokanchengyang/Flux-cpp/actions/workflows/release.yml/badge.svg)](https://github.com/xiaokanchengyang/Flux-cpp/actions/workflows/release.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 🚀 Features
+A modern, cross-platform archive management tool built with **C++23** and **Qt6**.
 
-### Core Functionality
+> **⚠️ Development Status**: This project is in active development. See [Current Status](#-current-status) for what's implemented vs. planned.
+
+## 🎯 Current Status
+
+### ✅ **Implemented Features**
+- **🏗️ Project Structure**: Modular architecture with `flux-core`, `flux-gui`, and `flux-cli`
+- **🔧 Build System**: Complete CMake configuration with cross-platform support
+- **🚀 CI/CD Pipeline**: Automated testing and packaging for Windows, Linux, and macOS
+- **📚 Modern C++**: C++23 features with compatibility layer for older compilers
+- **🎨 GUI Framework**: Qt6-based interface foundation
+- **📝 Documentation**: Comprehensive README, contributing guidelines, and code standards
+- **🔒 Resource Management**: Singleton-based resource manager with caching
+- **⚡ Error Handling**: Modern functional error handling with `std::expected`
+
+### 🚧 **In Development**
+- **📦 Archive Formats**: Basic ZIP support (other formats planned)
+- **🖥️ GUI Interface**: Core UI components and layouts
+- **💻 CLI Interface**: Command-line argument parsing and basic operations
+- **🧪 Testing Suite**: Unit tests with GoogleTest framework
+
+### 📋 **Planned Features**
 - **Multi-format Support**: ZIP, 7Z, TAR.GZ, TAR.XZ, TAR.ZSTD
 - **High Performance**: Optimized compression and extraction algorithms
-- **Cross-Platform**: Windows, Linux, and macOS support
-- **Modern UI**: Clean, intuitive interface with dark/light themes
-- **Command Line**: Powerful CLI for automation and scripting
-
-### Advanced Features
-- **Password Protection**: AES encryption for secure archives
-- **Selective Operations**: Extract or view specific files
-- **Progress Tracking**: Real-time progress with ETA
-- **File Preview**: Built-in text, image, and hex viewers
-- **Batch Processing**: Handle multiple archives simultaneously
-- **Smart Compression**: Automatic compression level optimization
+- **Advanced UI**: Dark/light themes, progress tracking, file preview
+- **Security**: Password protection with AES encryption
+- **Batch Operations**: Multiple archive handling
+- **Smart Compression**: Automatic optimization algorithms
 
 ## 📦 Installation
 

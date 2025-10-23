@@ -129,3 +129,60 @@ write_basic_package_version_file(
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMajorVersion
 )
+
+# --- CPack Configuration for Cross-Platform Packaging ---
+include(InstallRequiredSystemLibraries)
+
+# Basic package information
+set(CPACK_PACKAGE_NAME "Flux")
+set(CPACK_PACKAGE_VENDOR "xiaokanchengyang")
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_CONTACT "xiaokanchengyang@example.com")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Modern high-performance archive management tool")
+set(CPACK_PACKAGE_DESCRIPTION "Flux is a modern, high-performance archive manager with both GUI and CLI interfaces. It supports multiple archive formats and provides excellent user experience.")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/xiaokanchengyang/Flux-cpp")
+
+# Package file naming
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+
+# Platform-specific generators
+if(WIN32)
+    set(CPACK_GENERATOR "ZIP;NSIS")
+    # NSIS specific settings
+    set(CPACK_NSIS_DISPLAY_NAME "Flux Archive Manager")
+    set(CPACK_NSIS_PACKAGE_NAME "Flux")
+    set(CPACK_NSIS_CONTACT "xiaokanchengyang@example.com")
+    set(CPACK_NSIS_HELP_LINK "https://github.com/xiaokanchengyang/Flux-cpp")
+    set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/xiaokanchengyang/Flux-cpp")
+    set(CPACK_NSIS_MODIFY_PATH ON)
+    set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+elseif(APPLE)
+    set(CPACK_GENERATOR "ZIP;DragNDrop")
+    # macOS specific settings
+    set(CPACK_DMG_VOLUME_NAME "Flux Archive Manager")
+    set(CPACK_DMG_FORMAT "UDZO")
+elseif(UNIX)
+    set(CPACK_GENERATOR "TGZ;DEB;RPM")
+    # Debian package settings
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "xiaokanchengyang <xiaokanchengyang@example.com>")
+    set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
+    set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libqt6core6, libqt6gui6, libqt6widgets6")
+    
+    # RPM package settings
+    set(CPACK_RPM_PACKAGE_GROUP "Applications/Archiving")
+    set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+    set(CPACK_RPM_PACKAGE_REQUIRES "qt6-qtbase >= 6.5")
+endif()
+
+# Resource files to include
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+
+# Install targets - executables will be installed by their respective CMakeLists.txt
+# This ensures proper installation paths and dependencies
+
+include(CPack)

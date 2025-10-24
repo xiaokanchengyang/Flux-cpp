@@ -12,7 +12,8 @@ namespace Flux {
         }
 
         // Initialize third-party libraries
-        // TODO: Initialize compression libraries (zstd, zlib, lzma, etc.)
+        // Note: libzip, libarchive, zlib, liblzma, and zstd are initialized automatically
+        // No explicit initialization needed for these libraries
         
         std::cout << "Flux library initialized (version " << getVersion() << ")" << std::endl;
         g_initialized = true;
@@ -24,7 +25,8 @@ namespace Flux {
         }
 
         // Cleanup third-party library resources
-        // TODO: Cleanup compression library resources
+        // Note: libzip, libarchive, zlib, liblzma, and zstd cleanup automatically
+        // No explicit cleanup needed for these libraries
         
         std::cout << "Flux library cleaned up" << std::endl;
         g_initialized = false;

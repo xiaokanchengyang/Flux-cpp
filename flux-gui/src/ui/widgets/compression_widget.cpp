@@ -658,7 +658,30 @@ void CompressionWidget::createArchive() {
                            QString("Failed to create archive: %1").arg(error));
     });
     
-    // TODO: Start operation
+    // Start compression operation
+    auto operation = new Core::Archive::ArchiveOperation(this);
+    operation->setOutputPath(m_outputPath);
+    operation->setFilesToAdd(m_inputFiles);
+    operation->setCompressionLevel(m_compressionLevel);
+    
+    // Show progress dialog
+    QProgressDialog* progressDialog = new QProgressDialog("Creating archive...", "Cancel", 0, 100, this);
+    progressDialog->setWindowModality(Qt::WindowModal);
+    progressDialog->show();
+    
+    connect(operation, &Core::Archive::ArchiveOperation::progressChanged, 
+            progressDialog, &QProgressDialog::setValue);
+    connect(operation, &Core::Archive::ArchiveOperation::finished, this, [this, progressDialog]() {
+        progressDialog->close();
+        QMessageBox::information(this, "Success", "Archive created successfully!");
+        // Clear the input files list
+        m_inputFiles.clear();
+        updateFileList();
+    });
+    connect(progressDialog, &QProgressDialog::canceled, operation, &Core::Archive::ArchiveOperation::cancel);
+    
+    // Start the operation
+    operation->createArchive();
     qDebug() << "Creating archive:" << m_outputPath;
 }
 
@@ -708,8 +731,32 @@ void CompressionWidget::onPresetChanged() {
 }
 
 void CompressionWidget::onFileListContextMenu(const QPoint& position) {
-    Q_UNUSED(position)
-    // TODO: Show context menu for file list
+    QListWidgetItem* item = m_fileListWidget->itemAt(position);
+    
+    QMenu contextMenu(this);
+    
+    if (item) {
+        // Item-specific actions
+        contextMenu.addAction("Remove from List", this, [this, item]() {
+            int row = m_fileListWidget->row(item);
+            if (row >= 0 && row < m_inputFiles.size()) {
+                m_inputFiles.removeAt(row);
+                updateFileList();
+            }
+        });
+        contextMenu.addSeparator();
+    }
+    
+    // General actions
+    contextMenu.addAction("Add Files", this, &CompressionWidget::addFiles);
+    contextMenu.addAction("Add Folder", this, &CompressionWidget::addFolder);
+    contextMenu.addSeparator();
+    contextMenu.addAction("Clear All", this, [this]() {
+        m_inputFiles.clear();
+        updateFileList();
+    });
+    
+    contextMenu.exec(m_fileListWidget->mapToGlobal(position));
 }
 
 } // namespace FluxGUI::UI::Widgets

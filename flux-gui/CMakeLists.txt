@@ -56,7 +56,7 @@ include_directories(
 # Source files
 set(GUI_SOURCES
     # Main window
-    src/ui/modern_main_window.cpp
+    src/ui/windows/modern_main_window.cpp
     
     # Components
     src/ui/components/unified_drop_zone.cpp
@@ -89,13 +89,13 @@ set(GUI_SOURCES
     src/core/compression_engine.cpp
     
     # Application entry
-    src/main.cpp
+    src/application/main.cpp
 )
 
 # Header files
 set(GUI_HEADERS
     # Main window
-    src/ui/modern_main_window.h
+    src/ui/windows/modern_main_window.h
     
     # Components
     src/ui/components/unified_drop_zone.h

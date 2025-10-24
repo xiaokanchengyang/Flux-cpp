@@ -43,7 +43,7 @@ void SettingsPage::setupAppearanceGroup() {
     // Language selection
     layout->addWidget(new QLabel("Language:"), 1, 0);
     m_languageCombo = new QComboBox();
-    m_languageCombo->addItems({"English", "简体中文", "Français", "Deutsch", "日本語"});
+    m_languageCombo->addItems({"English", "Chinese (Simplified)", "French", "German", "Japanese"});
     layout->addWidget(m_languageCombo, 1, 1);
     
     // UI options

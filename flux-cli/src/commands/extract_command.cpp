@@ -155,7 +155,13 @@ int executeExtractCommand(const ExtractConfig& config) {
         // Get archive info to estimate size
         size_t estimated_size = 0;
         try {
-            // TODO: Implement archive info retrieval
+            // Get archive info for progress reporting
+            auto info_result = extractor->getArchiveInfo(config.archive, config.password);
+            if (info_result.has_value()) {
+                auto info = info_result.value();
+                spdlog::info("Archive contains {} files ({} bytes compressed, {} bytes uncompressed)", 
+                           info.file_count, info.compressed_size, info.uncompressed_size);
+            }
             // auto archive_info = extractor->getArchiveInfo(config.archive);
             // estimated_size = archive_info.uncompressed_size;
             // If unable to get info, use archive file size as estimate

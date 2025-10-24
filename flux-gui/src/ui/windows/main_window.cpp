@@ -279,7 +279,7 @@ void MainWindow::setupCentralWidget() {
 }
 
 void MainWindow::setupSidebar() {
-    // 创建侧边栏部件
+    // Create sidebar widget
     m_sidebarWidget = new QWidget();
     m_sidebarWidget->setFixedWidth(200);
     m_sidebarWidget->setStyleSheet(

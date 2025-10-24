@@ -6,7 +6,7 @@ BrowseView::BrowseView(QWidget *parent)
     : QWidget(parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    QLabel* label = new QLabel("浏览视图 - 待实现");
+    QLabel* label = new QLabel("Browse View - To be implemented");
     label->setAlignment(Qt::AlignCenter);
     layout->addWidget(label);
 }

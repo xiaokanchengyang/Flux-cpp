@@ -284,9 +284,47 @@ void ArchiveExplorerWidget::applyStyles() {
 
 // Slot implementations
 void ArchiveExplorerWidget::extractSelected() {
-    // TODO: Implement extract selected functionality
-    QMessageBox::information(this, "Extract Selected", 
-                           "Extract selected functionality will be implemented.");
+    QModelIndexList selected = m_treeView->selectionModel()->selectedIndexes();
+    if (selected.isEmpty()) {
+        QMessageBox::information(this, "Extract Selected", "No files selected for extraction.");
+        return;
+    }
+    
+    QString outputDir = QFileDialog::getExistingDirectory(this, "Select Output Directory");
+    if (outputDir.isEmpty()) {
+        return;
+    }
+    
+    // Get selected file paths
+    QStringList selectedFiles;
+    for (const auto& index : selected) {
+        if (index.column() == 0) { // Only process first column to avoid duplicates
+            QString filePath = m_model->data(index, Qt::DisplayRole).toString();
+            selectedFiles.append(filePath);
+        }
+    }
+    
+    // Create extraction operation
+    auto operation = new Core::Archive::ArchiveOperation(this);
+    operation->setArchivePath(m_archivePath);
+    operation->setOutputPath(outputDir);
+    operation->setSelectedFiles(selectedFiles);
+    
+    // Show progress dialog
+    QProgressDialog* progressDialog = new QProgressDialog("Extracting files...", "Cancel", 0, 100, this);
+    progressDialog->setWindowModality(Qt::WindowModal);
+    progressDialog->show();
+    
+    connect(operation, &Core::Archive::ArchiveOperation::progressChanged, 
+            progressDialog, &QProgressDialog::setValue);
+    connect(operation, &Core::Archive::ArchiveOperation::finished, this, [this, progressDialog]() {
+        progressDialog->close();
+        updateStatus("Extraction completed successfully");
+    });
+    connect(progressDialog, &QProgressDialog::canceled, operation, &Core::Archive::ArchiveOperation::cancel);
+    
+    // Start extraction
+    operation->extractSelected();
 }
 
 void ArchiveExplorerWidget::extractAll() {
@@ -298,15 +336,86 @@ void ArchiveExplorerWidget::extractAll() {
 }
 
 void ArchiveExplorerWidget::addFiles() {
-    // TODO: Implement add files functionality
-    QMessageBox::information(this, "Add Files", 
-                           "Add files functionality will be implemented.");
+    if (!hasArchiveLoaded()) {
+        return;
+    }
+    
+    QStringList files = QFileDialog::getOpenFileNames(this, "Select Files to Add");
+    if (files.isEmpty()) {
+        return;
+    }
+    
+    // Create add operation
+    auto operation = new Core::Archive::ArchiveOperation(this);
+    operation->setArchivePath(m_archivePath);
+    operation->setFilesToAdd(files);
+    
+    // Show progress dialog
+    QProgressDialog* progressDialog = new QProgressDialog("Adding files...", "Cancel", 0, 100, this);
+    progressDialog->setWindowModality(Qt::WindowModal);
+    progressDialog->show();
+    
+    connect(operation, &Core::Archive::ArchiveOperation::progressChanged, 
+            progressDialog, &QProgressDialog::setValue);
+    connect(operation, &Core::Archive::ArchiveOperation::finished, this, [this, progressDialog]() {
+        progressDialog->close();
+        updateStatus("Files added successfully");
+        // Reload archive contents
+        loadArchive(m_archivePath);
+    });
+    connect(progressDialog, &QProgressDialog::canceled, operation, &Core::Archive::ArchiveOperation::cancel);
+    
+    // Start adding files
+    operation->addFiles();
 }
 
 void ArchiveExplorerWidget::deleteSelected() {
-    // TODO: Implement delete selected functionality
-    QMessageBox::information(this, "Delete Selected", 
-                           "Delete selected functionality will be implemented.");
+    QModelIndexList selected = m_treeView->selectionModel()->selectedIndexes();
+    if (selected.isEmpty()) {
+        QMessageBox::information(this, "Delete Selected", "No files selected for deletion.");
+        return;
+    }
+    
+    // Get selected file paths
+    QStringList selectedFiles;
+    for (const auto& index : selected) {
+        if (index.column() == 0) { // Only process first column to avoid duplicates
+            QString filePath = m_model->data(index, Qt::DisplayRole).toString();
+            selectedFiles.append(filePath);
+        }
+    }
+    
+    // Confirm deletion
+    int result = QMessageBox::question(this, "Delete Files", 
+                                     QString("Are you sure you want to delete %1 selected file(s)?")
+                                     .arg(selectedFiles.size()),
+                                     QMessageBox::Yes | QMessageBox::No);
+    if (result != QMessageBox::Yes) {
+        return;
+    }
+    
+    // Create delete operation
+    auto operation = new Core::Archive::ArchiveOperation(this);
+    operation->setArchivePath(m_archivePath);
+    operation->setFilesToDelete(selectedFiles);
+    
+    // Show progress dialog
+    QProgressDialog* progressDialog = new QProgressDialog("Deleting files...", "Cancel", 0, 100, this);
+    progressDialog->setWindowModality(Qt::WindowModal);
+    progressDialog->show();
+    
+    connect(operation, &Core::Archive::ArchiveOperation::progressChanged, 
+            progressDialog, &QProgressDialog::setValue);
+    connect(operation, &Core::Archive::ArchiveOperation::finished, this, [this, progressDialog]() {
+        progressDialog->close();
+        updateStatus("Files deleted successfully");
+        // Reload archive contents
+        loadArchive(m_archivePath);
+    });
+    connect(progressDialog, &QProgressDialog::canceled, operation, &Core::Archive::ArchiveOperation::cancel);
+    
+    // Start deleting files
+    operation->deleteFiles();
 }
 
 void ArchiveExplorerWidget::testArchive() {
@@ -354,19 +463,92 @@ void ArchiveExplorerWidget::showProperties() {
 }
 
 void ArchiveExplorerWidget::onItemDoubleClicked(const QModelIndex& index) {
-    Q_UNUSED(index)
-    // TODO: Handle item double-click (extract or navigate)
+    if (!index.isValid()) {
+        return;
+    }
+    
+    // Get the item data
+    QString fileName = m_model->data(index, Qt::DisplayRole).toString();
+    bool isDirectory = m_model->data(index, Qt::UserRole).toBool(); // Assuming directory flag is stored in UserRole
+    
+    if (isDirectory) {
+        // Navigate into directory (expand/collapse)
+        if (m_treeView->isExpanded(index)) {
+            m_treeView->collapse(index);
+        } else {
+            m_treeView->expand(index);
+        }
+    } else {
+        // Extract and open file
+        QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+        QString outputPath = QDir(tempDir).filePath("flux_temp");
+        QDir().mkpath(outputPath);
+        
+        // Create extraction operation for single file
+        auto operation = new Core::Archive::ArchiveOperation(this);
+        operation->setArchivePath(m_archivePath);
+        operation->setOutputPath(outputPath);
+        operation->setSelectedFiles(QStringList() << fileName);
+        
+        connect(operation, &Core::Archive::ArchiveOperation::finished, this, [this, outputPath, fileName]() {
+            // Open the extracted file with default application
+            QString extractedFile = QDir(outputPath).filePath(fileName);
+            if (QFile::exists(extractedFile)) {
+                QDesktopServices::openUrl(QUrl::fromLocalFile(extractedFile));
+            }
+        });
+        
+        operation->extractSelected();
+    }
 }
 
 void ArchiveExplorerWidget::onContextMenuRequested(const QPoint& position) {
-    Q_UNUSED(position)
-    // TODO: Show context menu
+    QModelIndex index = m_treeView->indexAt(position);
+    
+    QMenu contextMenu(this);
+    
+    if (index.isValid()) {
+        // Item-specific actions
+        contextMenu.addAction("Extract Selected", this, &ArchiveExplorerWidget::extractSelected);
+        contextMenu.addAction("Delete Selected", this, &ArchiveExplorerWidget::deleteSelected);
+        contextMenu.addSeparator();
+        contextMenu.addAction("Properties", this, &ArchiveExplorerWidget::showProperties);
+    }
+    
+    // General actions
+    contextMenu.addAction("Extract All", this, &ArchiveExplorerWidget::extractAll);
+    contextMenu.addAction("Add Files", this, &ArchiveExplorerWidget::addFiles);
+    contextMenu.addSeparator();
+    contextMenu.addAction("Test Archive", this, &ArchiveExplorerWidget::testArchive);
+    contextMenu.addAction("Refresh", this, [this]() {
+        if (hasArchiveLoaded()) {
+            loadArchive(m_archivePath);
+        }
+    });
+    
+    contextMenu.exec(m_treeView->mapToGlobal(position));
 }
 
 void ArchiveExplorerWidget::onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected) {
-    Q_UNUSED(selected)
     Q_UNUSED(deselected)
-    // TODO: Update UI based on selection
+    
+    int selectedCount = selected.indexes().size() / m_model->columnCount(); // Divide by column count to get actual item count
+    
+    if (selectedCount == 0) {
+        updateStatus("No items selected");
+    } else if (selectedCount == 1) {
+        // Show information about the selected item
+        QModelIndex index = selected.indexes().first();
+        QString fileName = m_model->data(index, Qt::DisplayRole).toString();
+        updateStatus(QString("Selected: %1").arg(fileName));
+    } else {
+        updateStatus(QString("%1 items selected").arg(selectedCount));
+    }
+    
+    // Enable/disable actions based on selection
+    bool hasSelection = selectedCount > 0;
+    // Update toolbar buttons or menu items here if needed
+    emit selectionChanged(hasSelection);
 }
 
 } // namespace FluxGUI::UI::Widgets

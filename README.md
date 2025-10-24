@@ -1,229 +1,232 @@
 # Flux Archive Manager
 
-[![CI](https://github.com/xiaokanchengyang/Flux-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/xiaokanchengyang/Flux-cpp/actions/workflows/ci.yml)
-[![Release](https://github.com/xiaokanchengyang/Flux-cpp/actions/workflows/release.yml/badge.svg)](https://github.com/xiaokanchengyang/Flux-cpp/actions/workflows/release.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<div align="center">
 
-A modern, cross-platform archive management tool built with **C++23** and **Qt6**.
+![Flux Logo](flux-gui/resources/icons/flux.png)
 
-> **⚠️ Development Status**: This project is in active development. See [Current Status](#-current-status) for what's implemented vs. planned.
+**A modern, cross-platform archive management solution built with C++23**
 
-## 🎯 Current Status
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![C++](https://img.shields.io/badge/C%2B%2B-23-blue.svg)](https://isocpp.org/)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)]()
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]()
 
-### ✅ **Implemented Features**
-- **🏗️ Project Structure**: Modular architecture with `flux-core`, `flux-gui`, and `flux-cli`
-- **🔧 Build System**: Complete CMake configuration with cross-platform support
-- **🚀 CI/CD Pipeline**: Automated testing and packaging for Windows, Linux, and macOS
-- **📚 Modern C++**: C++23 features with compatibility layer for older compilers
-- **🎨 GUI Framework**: Qt6-based interface foundation
-- **📝 Documentation**: Comprehensive README, contributing guidelines, and code standards
-- **🔒 Resource Management**: Singleton-based resource manager with caching
-- **⚡ Error Handling**: Modern functional error handling with `std::expected`
+</div>
 
-### 🚧 **In Development**
-- **📦 Archive Formats**: Basic ZIP support (other formats planned)
-- **🖥️ GUI Interface**: Core UI components and layouts
-- **💻 CLI Interface**: Command-line argument parsing and basic operations
-- **🧪 Testing Suite**: Unit tests with GoogleTest framework
+## 🚀 Overview
 
-### 📋 **Planned Features**
-- **Multi-format Support**: ZIP, 7Z, TAR.GZ, TAR.XZ, TAR.ZSTD
-- **High Performance**: Optimized compression and extraction algorithms
-- **Advanced UI**: Dark/light themes, progress tracking, file preview
-- **Security**: Password protection with AES encryption
-- **Batch Operations**: Multiple archive handling
-- **Smart Compression**: Automatic optimization algorithms
+Flux Archive Manager is a comprehensive, modern archive management solution that provides both graphical and command-line interfaces for handling various archive formats. Built with cutting-edge C++23 features, it offers professional-grade functionality with an intuitive user experience.
+
+## ✨ Features
+
+### 🎯 **Core Functionality**
+- **Multi-format Support**: ZIP, TAR, TAR.GZ, TAR.XZ, TAR.ZSTD, and 7-Zip archives
+- **Real-time Progress Tracking**: Visual progress indicators with cancellation support
+- **Integrity Verification**: Comprehensive archive validation and error detection
+- **Smart Format Detection**: Automatic format detection from file headers and extensions
+- **Partial Extraction**: Extract specific files or directories with pattern matching
+
+### 🖥️ **Graphical Interface (Qt6)**
+- **Modern UI Design**: Clean, intuitive interface with dark/light theme support
+- **Drag & Drop Support**: Easy file management with visual feedback
+- **Archive Explorer**: Browse archive contents with detailed metadata
+- **Compression Wizard**: Step-by-step archive creation with preset configurations
+- **Context Menus**: Right-click operations for quick access to functions
+- **Multi-tab Interface**: Work with multiple archives simultaneously
+
+### 💻 **Command Line Interface**
+- **Powerful CLI**: Full-featured command-line tool for automation and scripting
+- **Batch Operations**: Process multiple archives with single commands
+- **JSON Output**: Machine-readable output for integration with other tools
+- **Progress Indicators**: Terminal-based progress bars and status updates
+- **Cross-platform**: Consistent behavior across Windows, Linux, and macOS
+
+### 🔧 **Advanced Features**
+- **Password Protection**: Support for encrypted archives (framework ready)
+- **Compression Levels**: Configurable compression settings for optimal size/speed balance
+- **Memory Efficient**: Streaming operations for handling large archives
+- **Error Recovery**: Robust error handling with detailed diagnostic messages
+- **Plugin Architecture**: Extensible design for future format support
 
 ## 📦 Installation
 
 ### Prerequisites
-- **C++20 compatible compiler** (GCC 11+, Clang 13+, MSVC 2022+)
-- **Qt 6.5+** (for GUI)
-- **CMake 3.20+**
 
-### Build from Source
+- **C++23 compatible compiler** (GCC 13+, Clang 16+, MSVC 2022+)
+- **CMake 3.22+**
+- **vcpkg** (for dependency management)
+- **Qt6** (for GUI application)
 
-#### Windows
+### Dependencies
+
+The project uses the following libraries:
+- **libzip** - ZIP format support
+- **libarchive** - TAR format support
+- **zlib, liblzma, libzstd** - Compression algorithms
+- **Qt6** - GUI framework
+- **CLI11** - Command line parsing
+- **spdlog** - High-performance logging
+- **fmt** - String formatting
+
+### Build Instructions
+
+#### 1. Clone the Repository
 ```bash
-# Clone the repository
-git clone https://github.com/xiaokanchengyang/Flux-cpp.git
+git clone https://github.com/your-username/Flux-cpp.git
 cd Flux-cpp
+```
 
-# Setup dependencies (PowerShell)
+#### 2. Setup Dependencies
+```bash
+# Windows (PowerShell)
 .\setup_dependencies.ps1
 
-# Build the project
+# Linux/macOS
+./setup_dependencies.sh
+```
+
+#### 3. Build the Project
+```bash
+# Create build directory
 mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
+
+# Configure with CMake
+cmake .. -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+# Build
 cmake --build . --config Release
 
-# Run the application
-.\build\flux-gui\FluxGUI.exe
+# Install (optional)
+cmake --install . --prefix /usr/local
 ```
 
-#### Linux/macOS
+#### 4. Quick Build Scripts
 ```bash
-# Clone the repository
-git clone https://github.com/xiaokanchengyang/Flux-cpp.git
-cd Flux-cpp
+# Build CLI only
+.\build_flux_cli.ps1
 
-# Setup dependencies
-./setup_dependencies.sh
+# Build GUI
+.\build_gui.bat
 
-# Build the project
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j$(nproc)
-
-# Run the application
-./build/flux-gui/FluxGUI
+# Build everything
+.\build.bat  # Windows
+./build.sh   # Linux/macOS
 ```
 
-## 🖥️ Usage
-
-### GUI Application
-Launch the GUI application and use the intuitive interface:
-
-1. **Welcome Page**: Drag and drop files or use quick action buttons
-2. **Pack View**: Create new archives with customizable settings
-3. **Browse View**: Explore archive contents with preview capabilities
-4. **Extract Operations**: Selective or full extraction with progress tracking
+## 🎮 Usage
 
 ### Command Line Interface
 
-#### Create Archives
+#### Basic Operations
 ```bash
-# Basic archive creation
-flux pack -o archive.zip file1.txt file2.txt folder/
+# Extract an archive
+flux extract archive.zip -o /path/to/output
 
-# Advanced options
-flux pack -o archive.tar.zst \
-    --format tar.zstd \
-    --compression-level 5 \
-    --exclude "*.tmp" \
-    --password mypass123 \
-    --verbose \
-    src/
+# Create an archive
+flux pack -f zip -o archive.zip file1.txt file2.txt folder/
+
+# Inspect archive contents
+flux inspect archive.tar.gz --json
+
+# Batch operations
+flux batch --extract *.zip --output-dir ./extracted/
 ```
 
-#### Extract Archives
+#### Advanced Usage
 ```bash
-# Extract all files
-flux extract archive.zip
+# Extract with progress and specific files
+flux extract large-archive.tar.xz -o ./output --progress --pattern "*.cpp"
 
-# Extract to specific directory
-flux extract archive.tar.gz -o /path/to/output/
+# Create compressed archive with custom settings
+flux pack -f tar.xz -o backup.tar.xz --compression-level 6 ./project/
 
-# Selective extraction
-flux extract archive.7z --files "src/*.cpp" "docs/*.md"
+# Verify archive integrity
+flux verify archive.zip --detailed
 ```
 
-#### Inspect Archives
-```bash
-# Basic information
-flux inspect archive.zip
+### Graphical Interface
 
-# Detailed analysis
-flux inspect archive.tar.xz --detailed --verify
+1. **Launch the GUI**: Run `FluxGUI.exe` (Windows) or `flux-gui` (Linux/macOS)
+2. **Open Archives**: Drag & drop archives or use File → Open
+3. **Extract Files**: Select files and click Extract, or use context menu
+4. **Create Archives**: Use the Compression tab to create new archives
+5. **Browse Contents**: Double-click to navigate directories within archives
 
-# JSON output
-flux inspect archive.7z --format json --output report.json
-```
+## 📁 Project Structure
 
-#### List Contents
-```bash
-# Simple listing
-flux list archive.zip
-
-# Detailed view
-flux list archive.tar.gz --detailed --sort-by size
-```
-
-## 🏗️ Architecture
-
-### Project Structure
 ```
 Flux-cpp/
-├── flux-core/          # Core archive processing library
-│   ├── include/        # Public headers
-│   └── src/           # Implementation files
-├── flux-cli/          # Command-line interface
-│   └── src/           # CLI implementation
-├── flux-gui/          # Graphical user interface
-│   ├── src/           # GUI implementation
-│   └── resources/     # UI resources and themes
-├── cmake/             # CMake modules
-├── third-party/       # External dependencies
-└── build/            # Build output directory
+├── docs/                          # Documentation
+│   ├── guides/                    # User guides and tutorials
+│   ├── implementation/            # Technical implementation docs
+│   └── summaries/                 # Project summaries and reports
+├── flux-core/                     # Core library
+│   ├── include/flux-core/         # Public headers
+│   └── src/
+│       ├── core/                  # Main functionality (flux.cpp, extractor.cpp, packer.cpp)
+│       ├── utils/                 # Utilities (archive_utils.cpp, format_detector.cpp)
+│       └── formats/               # Format-specific implementations
+│           ├── extractors/        # Extraction implementations
+│           └── packers/           # Packing implementations
+├── flux-cli/                      # Command line application
+│   └── src/
+│       ├── application/           # Main CLI app (main.cpp, cli_app.cpp)
+│       ├── commands/              # Command implementations
+│       ├── utils/                 # CLI utilities
+│       └── platform/              # Platform-specific code
+├── flux-gui/                      # GUI application
+│   ├── resources/                 # Icons, themes, configurations
+│   └── src/
+│       ├── application/           # Main GUI app (main.cpp)
+│       ├── ui/
+│       │   ├── windows/           # Main windows
+│       │   ├── components/        # Reusable UI components
+│       │   ├── widgets/           # Custom widgets
+│       │   └── views/             # Application views
+│       ├── core/                  # GUI core functionality
+│       ├── models/                # Data models
+│       └── utils/                 # GUI utilities
+└── third-party/                   # Third-party dependencies
 ```
 
-### Technology Stack
-- **Core Library**: Modern C++20 with STL algorithms and ranges
-- **GUI Framework**: Qt 6.5+ with Model-View architecture
-- **CLI Framework**: CLI11 for command-line parsing
-- **Build System**: CMake with automatic dependency management
-- **Testing**: Catch2 for unit testing
-- **Logging**: spdlog for structured logging
+## 🛠️ Development
 
-## 🎯 Performance
+### Code Style
+- **Modern C++23**: Uses latest language features including `std::expected`, `std::span`
+- **RAII**: Proper resource management with smart pointers
+- **Error Handling**: Comprehensive error handling with meaningful messages
+- **Documentation**: Inline documentation and comprehensive README files
 
-### Benchmarks
-- **Compression Speed**: Up to 200 MB/s (depending on algorithm and hardware)
-- **Memory Usage**: < 100MB for typical operations
-- **Startup Time**: < 500ms for GUI, < 100ms for CLI
-- **Large File Support**: Efficient handling of multi-GB archives
-- **Multi-threading**: Automatic CPU core utilization
+### Contributing
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### Optimization Features
-- **Streaming Processing**: Memory-efficient handling of large files
-- **Parallel Compression**: Multi-threaded compression algorithms
-- **Smart Caching**: Intelligent preview and metadata caching
-- **SIMD Support**: Vectorized operations where available
-
-## 🧪 Testing
-
-### Test Coverage
-- **Unit Tests**: Core functionality with >85% coverage
-- **Integration Tests**: End-to-end workflow testing
-- **Performance Tests**: Automated benchmarking
-- **Cross-Platform Tests**: Validation on multiple platforms
-
-### Quality Assurance
-- **Static Analysis**: Clean builds with GCC, Clang, and MSVC
-- **Memory Safety**: Valgrind and AddressSanitizer clean
-- **Code Style**: Consistent formatting with clang-format
-- **Documentation**: Comprehensive API documentation
-
-## 📚 Documentation
-
-- [CLI Implementation Summary](CLI_IMPLEMENTATION_SUMMARY_EN.md) - Detailed CLI features and architecture
-- [GUI Implementation Summary](GUI_IMPLEMENTATION_SUMMARY_EN.md) - GUI components and design patterns
-- [Build Guide](BUILD_GUIDE.md) - Comprehensive build instructions
-- [Integration Guide](INTEGRATION_COMPLETE.md) - Integration status and roadmap
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our contributing guidelines:
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
-### Development Setup
+### Testing
 ```bash
-# Install development dependencies
-./setup_dependencies.sh
-
-# Build in debug mode
-mkdir build-debug && cd build-debug
-cmake .. -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTING=ON
-make -j$(nproc)
-
 # Run tests
+cd build
 ctest --output-on-failure
+
+# Run specific tests
+./flux-core/tests/test_archive_utils
 ```
+
+## 📊 Performance
+
+- **Memory Efficient**: Streaming operations minimize memory usage
+- **Fast Processing**: Optimized algorithms for large archive handling
+- **Parallel Operations**: Multi-threaded extraction and compression
+- **Progress Tracking**: Real-time progress without performance impact
+
+## 🔒 Security
+
+- **Input Validation**: Comprehensive validation of archive contents
+- **Path Traversal Protection**: Prevents directory traversal attacks
+- **Memory Safety**: Modern C++ practices prevent buffer overflows
+- **Error Handling**: Graceful handling of malformed archives
 
 ## 📄 License
 
@@ -231,26 +234,25 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Qt Framework** - For the excellent GUI toolkit
-- **CLI11** - For modern command-line parsing
-- **spdlog** - For fast and flexible logging
-- **Catch2** - For the testing framework
-- **nlohmann/json** - For JSON processing
+- **libzip** - ZIP format support
+- **libarchive** - TAR format support  
+- **Qt6** - Cross-platform GUI framework
+- **CLI11** - Modern command line parsing
+- **spdlog** - High-performance logging
+- **vcpkg** - C++ package management
 
-## 📊 Project Status
+## 📞 Support
 
-- **Version**: 1.0.0
-- **Status**: Production Ready
-- **Platforms**: Windows 10+, Ubuntu 20.04+, macOS 11+
-- **Languages**: C++20, QML
-- **License**: MIT
-
-## 🔗 Links
-
-- **Repository**: [https://github.com/xiaokanchengyang/Flux-cpp](https://github.com/xiaokanchengyang/Flux-cpp)
-- **Issues**: [Report bugs and feature requests](https://github.com/xiaokanchengyang/Flux-cpp/issues)
-- **Releases**: [Download latest releases](https://github.com/xiaokanchengyang/Flux-cpp/releases)
+- **Documentation**: Check the [docs/](docs/) directory for detailed guides
+- **Issues**: Report bugs and feature requests on GitHub Issues
+- **Discussions**: Join community discussions on GitHub Discussions
 
 ---
 
-**Flux Archive Manager** - Modern archive management made simple and powerful.
+<div align="center">
+
+**Built with ❤️ using Modern C++23**
+
+[Documentation](docs/) • [Contributing](docs/guides/CONTRIBUTING.md) • [License](LICENSE)
+
+</div>

@@ -147,10 +147,10 @@ namespace Flux {
             ExtractResult extractPartial(
                 const std::filesystem::path& archive_path,
                 const std::filesystem::path& output_dir,
-                const std::vector<std::string>& file_patterns,
+                std::span<const std::string> file_patterns,
                 const ExtractOptions& options,
-                const ProgressCallback& on_progress,
-                const ErrorCallback& on_error) override {
+                const ProgressCallback& on_progress = nullptr,
+                const ErrorCallback& on_error = nullptr) override {
                 
                 ExtractResult result;
                 result.success = false;
@@ -239,9 +239,9 @@ namespace Flux {
                 return result;
             }
 
-            std::vector<ArchiveEntry> listContents(
+            Flux::expected<std::vector<ArchiveEntry>, std::string> listContents(
                 const std::filesystem::path& archive_path,
-                const std::string& password) override {
+                std::string_view password = "") override {
                 
                 std::vector<ArchiveEntry> entries;
                 
@@ -251,7 +251,7 @@ namespace Flux {
                 if (!archive) {
                     zip_error_t error;
                     zip_error_init_with_code(&error, error_code);
-                    throw CorruptedArchiveException(fmt::format("Cannot open ZIP archive: {}", zip_error_strerror(&error)));
+                    return Flux::unexpected<std::string>(fmt::format("Cannot open ZIP archive: {}", zip_error_strerror(&error)));
                 }
 
                 try {
@@ -286,16 +286,16 @@ namespace Flux {
 
                 } catch (const std::exception& e) {
                     zip_close(archive);
-                    throw CorruptedArchiveException(fmt::format("Cannot list ZIP contents: {}", e.what()));
+                    return Flux::unexpected<std::string>(fmt::format("Cannot list ZIP contents: {}", e.what()));
                 }
 
                 zip_close(archive);
                 return entries;
             }
 
-            ArchiveInfo getArchiveInfo(
+            Flux::expected<ArchiveInfo, std::string> getArchiveInfo(
                 const std::filesystem::path& archive_path,
-                const std::string& password) override {
+                std::string_view password = "") override {
                 
                 ArchiveInfo info;
                 info.path = archive_path;
@@ -308,7 +308,7 @@ namespace Flux {
                 if (!archive) {
                     zip_error_t error;
                     zip_error_init_with_code(&error, error_code);
-                    throw CorruptedArchiveException(fmt::format("Cannot open ZIP archive: {}", zip_error_strerror(&error)));
+                    return Flux::unexpected<std::string>(fmt::format("Cannot open ZIP archive: {}", zip_error_strerror(&error)));
                 }
 
                 try {
@@ -339,16 +339,16 @@ namespace Flux {
 
                 } catch (const std::exception& e) {
                     zip_close(archive);
-                    throw CorruptedArchiveException(fmt::format("Cannot get ZIP archive info: {}", e.what()));
+                    return Flux::unexpected<std::string>(fmt::format("Cannot get ZIP archive info: {}", e.what()));
                 }
 
                 zip_close(archive);
                 return info;
             }
 
-            std::pair<bool, std::string> verifyIntegrity(
+            Flux::expected<void, std::string> verifyIntegrity(
                 const std::filesystem::path& archive_path,
-                const std::string& password) override {
+                std::string_view password = "") override {
                 
                 int error_code = 0;
                 zip_t* archive = zip_open(archive_path.string().c_str(), ZIP_RDONLY, &error_code);
@@ -356,7 +356,7 @@ namespace Flux {
                 if (!archive) {
                     zip_error_t error;
                     zip_error_init_with_code(&error, error_code);
-                    return {false, fmt::format("Cannot open ZIP archive: {}", zip_error_strerror(&error))};
+                    return Flux::unexpected<std::string>(fmt::format("Cannot open ZIP archive: {}", zip_error_strerror(&error)));
                 }
 
                 try {
@@ -367,7 +367,7 @@ namespace Flux {
                         zip_stat_t stat;
                         if (zip_stat_index(archive, i, 0, &stat) != 0) {
                             zip_close(archive);
-                            return {false, fmt::format("Cannot get info for entry {}", i)};
+                            return Flux::unexpected<std::string>(fmt::format("Cannot get info for entry {}", i));
                         }
 
                         // Skip directories
@@ -378,7 +378,7 @@ namespace Flux {
                         zip_file_t* file = zip_fopen_index(archive, i, 0);
                         if (!file) {
                             zip_close(archive);
-                            return {false, fmt::format("Cannot open file in archive: {}", stat.name)};
+                            return Flux::unexpected<std::string>(fmt::format("Cannot open file in archive: {}", stat.name));
                         }
 
                         // Try to read the entire file to verify integrity
@@ -395,20 +395,20 @@ namespace Flux {
 
                         if (total_read != static_cast<zip_int64_t>(stat.size)) {
                             zip_close(archive);
-                            return {false, fmt::format("Size mismatch for file: {}", stat.name)};
+                            return Flux::unexpected<std::string>(fmt::format("Size mismatch for file: {}", stat.name));
                         }
                     }
 
                     zip_close(archive);
-                    return {true, "ZIP archive integrity verified successfully"};
+                    return {};
 
                 } catch (const std::exception& e) {
                     zip_close(archive);
-                    return {false, fmt::format("Integrity verification failed: {}", e.what())};
+                    return Flux::unexpected<std::string>(fmt::format("Integrity verification failed: {}", e.what()));
                 }
             }
 
-            ArchiveFormat detectFormat(
+            Flux::expected<ArchiveFormat, std::string> detectFormat(
                 const std::filesystem::path& archive_path) override {
                 
                 return ArchiveFormat::ZIP;

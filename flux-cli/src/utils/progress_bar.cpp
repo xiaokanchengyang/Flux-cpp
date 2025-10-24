@@ -253,4 +253,202 @@ void SimpleProgressBar::finish(const std::string& message) {
     std::cout << std::endl;
 }
 
+// DetailedProgressReporter implementation
+DetailedProgressReporter::DetailedProgressReporter(bool quiet_mode)
+    : m_quietMode(quiet_mode), m_started(false), m_totalSize(0), m_processedBytes(0),
+      m_filesProcessed(0), m_totalFiles(0), m_originalSize(0), m_compressedSize(0),
+      m_currentFileSize(0) {
+}
+
+DetailedProgressReporter::~DetailedProgressReporter() {
+    if (m_started) {
+        finish(false, "Operation interrupted");
+    }
+}
+
+void DetailedProgressReporter::start(const std::string& operation, const std::string& source,
+                                   const std::string& destination, size_t total_size) {
+    if (m_quietMode) return;
+    
+    m_operation = operation;
+    m_source = source;
+    m_destination = destination;
+    m_totalSize = total_size;
+    m_startTime = std::chrono::steady_clock::now();
+    m_started = true;
+    
+    std::cout << "\n";
+    spdlog::info("Starting {} operation", operation);
+    spdlog::info("Source: {}", source);
+    spdlog::info("Destination: {}", destination);
+    
+    if (total_size > 0) {
+        spdlog::info("Total size: {}", FormatUtils::formatFileSize(total_size));
+    }
+    
+    // Create main progress bar
+    m_mainProgress = std::make_unique<indicators::ProgressBar>(
+        indicators::option::BarWidth{50},
+        indicators::option::Start{"["},
+        indicators::option::Fill{"█"},
+        indicators::option::Lead{"█"},
+        indicators::option::Remainder{" "},
+        indicators::option::End{"]"},
+        indicators::option::PrefixText{"Overall Progress "},
+        indicators::option::ForegroundColor{indicators::Color::green},
+        indicators::option::ShowElapsedTime{true},
+        indicators::option::ShowRemainingTime{true}
+    );
+    
+    // Create file progress bar
+    m_fileProgress = std::make_unique<indicators::ProgressBar>(
+        indicators::option::BarWidth{50},
+        indicators::option::Start{"["},
+        indicators::option::Fill{"█"},
+        indicators::option::Lead{"█"},
+        indicators::option::Remainder{" "},
+        indicators::option::End{"]"},
+        indicators::option::PrefixText{"Current File    "},
+        indicators::option::ForegroundColor{indicators::Color::blue},
+        indicators::option::ShowElapsedTime{false},
+        indicators::option::ShowRemainingTime{false}
+    );
+}
+
+void DetailedProgressReporter::updateFile(const std::string& current_file, size_t file_size,
+                                        size_t files_processed, size_t total_files) {
+    if (m_quietMode || !m_started) return;
+    
+    m_currentFile = current_file;
+    m_currentFileSize = file_size;
+    m_filesProcessed = files_processed;
+    m_totalFiles = total_files;
+    
+    // Update file progress bar
+    std::string file_display = current_file;
+    if (file_display.length() > 30) {
+        file_display = "..." + file_display.substr(file_display.length() - 27);
+    }
+    
+    m_fileProgress->set_option(indicators::option::PostfixText{
+        fmt::format(" {} ({}/{})", file_display, files_processed, total_files)
+    });
+    
+    m_fileProgress->set_progress(0);
+}
+
+void DetailedProgressReporter::updateOverall(float percentage, size_t processed_bytes, size_t total_bytes) {
+    if (m_quietMode || !m_started) return;
+    
+    m_processedBytes = processed_bytes;
+    
+    // Update main progress bar
+    m_mainProgress->set_progress(static_cast<size_t>(percentage));
+    
+    auto now = std::chrono::steady_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - m_startTime);
+    
+    if (processed_bytes > 0 && elapsed.count() > 0) {
+        double speed = static_cast<double>(processed_bytes) / elapsed.count();
+        m_mainProgress->set_option(indicators::option::PostfixText{
+            fmt::format(" {}/{} @ {}/s", 
+                       FormatUtils::formatFileSize(processed_bytes),
+                       FormatUtils::formatFileSize(total_bytes),
+                       FormatUtils::formatFileSize(static_cast<size_t>(speed)))
+        });
+    }
+}
+
+void DetailedProgressReporter::reportCompression(size_t original_size, size_t compressed_size) {
+    m_originalSize += original_size;
+    m_compressedSize += compressed_size;
+}
+
+void DetailedProgressReporter::finish(bool success, const std::string& message) {
+    if (!m_started) return;
+    
+    m_started = false;
+    
+    if (!m_quietMode) {
+        // Complete progress bars
+        if (m_mainProgress) {
+            m_mainProgress->set_progress(100);
+        }
+        if (m_fileProgress) {
+            m_fileProgress->set_progress(100);
+        }
+        
+        std::cout << "\n";
+        
+        auto end_time = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - m_startTime);
+        
+        if (success) {
+            spdlog::info("✓ {} completed successfully", m_operation);
+        } else {
+            spdlog::error("✗ {} failed", m_operation);
+            if (!message.empty()) {
+                spdlog::error("Error: {}", message);
+            }
+        }
+        
+        printDetailedStats();
+        printCompressionStats();
+    }
+}
+
+Flux::ProgressCallback DetailedProgressReporter::createProgressCallback() {
+    return [this](float percentage, size_t processed, size_t total, const std::string& current_item) {
+        if (!m_quietMode && m_started) {
+            // Update file progress if we have current item info
+            if (!current_item.empty() && current_item != m_currentFile) {
+                updateFile(current_item, 0, m_filesProcessed + 1, m_totalFiles);
+            }
+            
+            // Update file progress bar
+            if (m_fileProgress) {
+                m_fileProgress->set_progress(static_cast<size_t>(percentage));
+            }
+            
+            // Update overall progress
+            updateOverall(percentage, processed, total);
+        }
+    };
+}
+
+void DetailedProgressReporter::printDetailedStats() {
+    if (m_quietMode) return;
+    
+    auto end_time = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - m_startTime);
+    
+    spdlog::info("Operation Statistics:");
+    spdlog::info("  Duration: {}", FormatUtils::formatDuration(duration.count()));
+    spdlog::info("  Files processed: {}", m_filesProcessed);
+    
+    if (m_processedBytes > 0) {
+        spdlog::info("  Data processed: {}", FormatUtils::formatFileSize(m_processedBytes));
+        
+        if (duration.count() > 0) {
+            double throughput = static_cast<double>(m_processedBytes) / (duration.count() / 1000.0);
+            spdlog::info("  Average throughput: {}/s", FormatUtils::formatFileSize(static_cast<size_t>(throughput)));
+        }
+    }
+}
+
+void DetailedProgressReporter::printCompressionStats() {
+    if (m_quietMode || m_originalSize == 0) return;
+    
+    if (m_compressedSize > 0) {
+        double ratio = static_cast<double>(m_compressedSize) / m_originalSize;
+        double savings = (1.0 - ratio) * 100.0;
+        
+        spdlog::info("Compression Statistics:");
+        spdlog::info("  Original size: {}", FormatUtils::formatFileSize(m_originalSize));
+        spdlog::info("  Compressed size: {}", FormatUtils::formatFileSize(m_compressedSize));
+        spdlog::info("  Compression ratio: {:.1f}%", ratio * 100.0);
+        spdlog::info("  Space saved: {:.1f}%", savings);
+    }
+}
+
 } // namespace FluxCLI::Utils

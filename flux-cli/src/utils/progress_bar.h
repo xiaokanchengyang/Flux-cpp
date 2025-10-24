@@ -65,12 +65,77 @@ namespace FluxCLI::Utils {
         
         // Performance statistics
         std::chrono::steady_clock::time_point m_startTime;
-        size_t m_lastProcessedBytes;
         std::chrono::steady_clock::time_point m_lastUpdateTime;
-        
-        // Display information
-        std::string m_taskName;
+        size_t m_lastProcessedBytes;
         size_t m_totalSize;
+        std::string m_taskName;
+    };
+    
+    /**
+     * Enhanced progress reporter with detailed statistics
+     */
+    class DetailedProgressReporter {
+    public:
+        DetailedProgressReporter(bool quiet_mode = false);
+        ~DetailedProgressReporter();
+        
+        /**
+         * Start progress reporting with detailed information
+         */
+        void start(const std::string& operation, const std::string& source, 
+                  const std::string& destination, size_t total_size = 0);
+        
+        /**
+         * Update progress with file-level details
+         */
+        void updateFile(const std::string& current_file, size_t file_size, 
+                       size_t files_processed, size_t total_files);
+        
+        /**
+         * Update overall progress
+         */
+        void updateOverall(float percentage, size_t processed_bytes, size_t total_bytes);
+        
+        /**
+         * Report compression statistics
+         */
+        void reportCompression(size_t original_size, size_t compressed_size);
+        
+        /**
+         * Finish with detailed summary
+         */
+        void finish(bool success, const std::string& message = "");
+        
+        /**
+         * Create Flux-compatible progress callback
+         */
+        Flux::ProgressCallback createProgressCallback();
+        
+    private:
+        void printDetailedStats();
+        void printCompressionStats();
+        
+        bool m_quietMode;
+        bool m_started;
+        std::string m_operation;
+        std::string m_source;
+        std::string m_destination;
+        
+        // Statistics
+        std::chrono::steady_clock::time_point m_startTime;
+        size_t m_totalSize;
+        size_t m_processedBytes;
+        size_t m_filesProcessed;
+        size_t m_totalFiles;
+        size_t m_originalSize;
+        size_t m_compressedSize;
+        
+        // Current file info
+        std::string m_currentFile;
+        size_t m_currentFileSize;
+        
+        std::unique_ptr<indicators::ProgressBar> m_mainProgress;
+        std::unique_ptr<indicators::ProgressBar> m_fileProgress;
     };
     
     /**

@@ -177,46 +177,39 @@ std::vector<DisplayEntry> getArchiveContents(const std::filesystem::path& archiv
     std::vector<DisplayEntry> entries;
     
     try {
-        // TODO: Implement archive content retrieval logic here
-        // Use Flux::listArchiveContents() or similar function
+        // Detect archive format and create appropriate extractor
+        auto format_result = Flux::detectArchiveFormat(archive_path);
+        if (!format_result.has_value()) {
+            spdlog::error("Cannot detect archive format: {}", format_result.error());
+            return entries;
+        }
         
-        // Pseudo code:
-        // auto flux_entries = Flux::listArchiveContents(archive_path, password);
-        // for (const auto& flux_entry : flux_entries) {
-        //     DisplayEntry entry;
-        //     entry.name = flux_entry.name;
-        //     entry.path = flux_entry.path.string();
-        //     entry.is_directory = flux_entry.is_directory;
-        //     entry.compressed_size = flux_entry.compressed_size;
-        //     entry.uncompressed_size = flux_entry.uncompressed_size;
-        //     entry.modification_time = flux_entry.modification_time;
-        //     entry.permissions = flux_entry.permissions;
-        //     entry.depth = std::count(entry.path.begin(), entry.path.end(), '/');
-        //     entries.push_back(entry);
-        // }
+        auto extractor = Flux::createExtractor(format_result.value());
+        if (!extractor) {
+            spdlog::error("Cannot create extractor for format");
+            return entries;
+        }
         
-        // Temporary mock data
-        DisplayEntry entry1;
-        entry1.name = "example.txt";
-        entry1.path = "example.txt";
-        entry1.is_directory = false;
-        entry1.compressed_size = 1024;
-        entry1.uncompressed_size = 2048;
-        entry1.modification_time = "2024-01-01 12:00:00";
-        entry1.permissions = 0644;
-        entry1.depth = 0;
-        entries.push_back(entry1);
+        // Get archive contents
+        auto contents_result = extractor->listContents(archive_path, password);
+        if (!contents_result.has_value()) {
+            spdlog::error("Cannot list archive contents: {}", contents_result.error());
+            return entries;
+        }
         
-        DisplayEntry entry2;
-        entry2.name = "folder";
-        entry2.path = "folder/";
-        entry2.is_directory = true;
-        entry2.compressed_size = 0;
-        entry2.uncompressed_size = 0;
-        entry2.modification_time = "2024-01-01 12:00:00";
-        entry2.permissions = 0755;
-        entry2.depth = 0;
-        entries.push_back(entry2);
+        // Convert Flux entries to display entries
+        for (const auto& flux_entry : contents_result.value()) {
+            DisplayEntry entry;
+            entry.name = flux_entry.name;
+            entry.path = flux_entry.path;
+            entry.is_directory = flux_entry.is_directory;
+            entry.compressed_size = flux_entry.compressed_size;
+            entry.uncompressed_size = flux_entry.uncompressed_size;
+            entry.modification_time = flux_entry.modification_time;
+            entry.permissions = flux_entry.permissions;
+            entry.depth = std::count(entry.path.begin(), entry.path.end(), '/');
+            entries.push_back(entry);
+        }
         
     } catch (const std::exception& e) {
         throw Flux::CorruptedArchiveException("Cannot read archive contents: " + std::string(e.what()));
@@ -340,7 +333,13 @@ void outputTree(const std::vector<DisplayEntry>& entries, const InspectConfig& c
 void outputJSON(const std::vector<DisplayEntry>& entries, const InspectConfig& config) {
     nlohmann::json json_output;
     json_output["archive"] = config.archive.string();
-    json_output["format"] = "unknown"; // TODO: Get from configuration
+    // Detect and set archive format
+    auto format_result = Flux::detectArchiveFormat(config.archive);
+    if (format_result.has_value()) {
+        json_output["format"] = Flux::formatToString(format_result.value());
+    } else {
+        json_output["format"] = "unknown";
+    }
     json_output["entries"] = nlohmann::json::array();
     
     for (const auto& entry : entries) {

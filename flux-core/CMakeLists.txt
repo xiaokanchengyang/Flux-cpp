@@ -5,21 +5,26 @@ project(flux-core VERSION 1.0.0 LANGUAGES CXX)
 # Create static library
 add_library(flux-core STATIC)
 
-# Specify source files
+# Specify source files with new directory structure
 target_sources(flux-core PRIVATE
-    src/flux.cpp
-    src/packer.cpp
-    src/extractor.cpp
-    src/archive_utils.cpp
-    src/format_detector.cpp
+    # Core functionality
+    src/core/flux.cpp
+    src/core/packer.cpp
+    src/core/extractor.cpp
     
-    # Format implementations (real implementations)
-    src/formats/zip_packer_impl.cpp
-    src/formats/zip_extractor_impl.cpp
-    src/formats/tar_packer_impl.cpp
-    src/formats/tar_extractor_impl.cpp
-    src/formats/sevenzip_packer_impl.cpp
-    src/formats/sevenzip_extractor_impl.cpp
+    # Utilities
+    src/utils/archive_utils.cpp
+    src/utils/format_detector.cpp
+    
+    # Format implementations - Packers
+    src/formats/packers/zip_packer_impl.cpp
+    src/formats/packers/tar_packer_impl.cpp
+    src/formats/packers/sevenzip_packer_impl.cpp
+    
+    # Format implementations - Extractors
+    src/formats/extractors/zip_extractor_impl.cpp
+    src/formats/extractors/tar_extractor_impl.cpp
+    src/formats/extractors/sevenzip_extractor_impl.cpp
 )
 
 # Specify public include directories
@@ -57,6 +62,7 @@ endif()
 # Link third-party dependencies
 find_package(PkgConfig REQUIRED)
 find_package(libzip CONFIG REQUIRED)
+find_package(LibArchive REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(LibLZMA REQUIRED)
 find_package(zstd CONFIG REQUIRED)
@@ -65,6 +71,7 @@ find_package(spdlog CONFIG REQUIRED)
 
 target_link_libraries(flux-core PRIVATE
     libzip::zip
+    LibArchive::LibArchive
     ZLIB::ZLIB
     LibLZMA::LibLZMA
     $<IF:$<TARGET_EXISTS:zstd::libzstd_shared>,zstd::libzstd_shared,zstd::libzstd_static>

@@ -3,6 +3,9 @@
 #include "commands/pack_command.h"
 #include "commands/extract_command.h"
 #include "commands/inspect_command.h"
+#include "commands/auto_command.h"
+#include "commands/batch_command.h"
+#include "commands/smart_command.h"
 #include "utils/format_utils.h"
 
 #include <flux-core/flux.h>
@@ -115,6 +118,18 @@ void CLIApp::setupCommands() {
     m_app->add_subcommand("ls", "View archive contents (alias for inspect)")
          ->callback([inspect_cmd]() { inspect_cmd->parse(""); });
     Commands::setupInspectCommand(inspect_cmd, m_verbose, m_quiet);
+    
+    // auto command - intelligent archive operations
+    auto auto_cmd = m_app->add_subcommand("auto", "Automatically detect and perform archive operations");
+    Commands::setupAutoCommand(auto_cmd, m_verbose, m_quiet);
+    
+    // batch command - batch operations on multiple archives
+    auto batch_cmd = m_app->add_subcommand("batch", "Perform batch operations on multiple archives");
+    Commands::setupBatchCommand(batch_cmd, m_verbose, m_quiet);
+    
+    // smart command - smart compression with optimization
+    auto smart_cmd = m_app->add_subcommand("smart", "Smart compression with automatic optimization");
+    Commands::setupSmartCommand(smart_cmd, m_verbose, m_quiet);
 }
 
 void CLIApp::setupLogging() {

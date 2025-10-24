@@ -6,6 +6,8 @@
 #include <ranges>
 #include <algorithm>
 #include <format>
+#include <fstream>
+#include <cstring>
 
 // Forward declarations for format implementation classes
 namespace Flux::Formats {
@@ -65,7 +67,30 @@ namespace Flux {
             });
 
         if (detected_format == extension_mappings.end()) {
-            // TODO: Implement file header detection logic
+            // Try file header detection as fallback
+            std::ifstream file(archive_path, std::ios::binary);
+            if (file.is_open()) {
+                char header[8];
+                file.read(header, sizeof(header));
+                file.close();
+                
+                // Check ZIP signature
+                if (header[0] == 'P' && header[1] == 'K' && 
+                    (header[2] == 0x03 || header[2] == 0x05 || header[2] == 0x07)) {
+                    return ArchiveFormat::ZIP;
+                }
+                
+                // Check TAR signature (ustar magic at offset 257, but we check first few bytes for common patterns)
+                if (std::memcmp(header, "\x1f\x8b", 2) == 0) { // GZIP magic
+                    return ArchiveFormat::TAR_GZ;
+                }
+                if (std::memcmp(header, "\xfd\x37\x7a\x58\x5a\x00", 6) == 0) { // XZ magic
+                    return ArchiveFormat::TAR_XZ;
+                }
+                if (std::memcmp(header, "\x28\xb5\x2f\xfd", 4) == 0) { // ZSTD magic
+                    return ArchiveFormat::TAR_ZSTD;
+                }
+            }
             return Flux::unexpected<std::string>{std::format("{}: {}", 
                                              Constants::ErrorMessages::UNSUPPORTED_FORMAT,
                                              filename)};

@@ -53,93 +53,27 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-# Source files
+# Source files (minimal working set)
 set(GUI_SOURCES
-    # Main window
-    src/ui/windows/modern_main_window.cpp
-    
-    # Components
-    src/ui/components/unified_drop_zone.cpp
-    src/ui/components/modern_toolbar.cpp
-    src/ui/components/smart_status_bar.cpp
-    src/ui/components/modern_button.cpp
-    src/ui/components/animated_widget.cpp
-    src/ui/components/progress_indicator.cpp
-    
-    # Views
-    src/ui/views/modern_welcome_view.cpp
-    src/ui/views/archive_browser_view.cpp
-    src/ui/views/settings_view.cpp
-    src/ui/views/extraction_view.cpp
-    
-    # Managers
-    src/ui/managers/keyboard_shortcut_manager.cpp
-    src/ui/managers/theme_manager.cpp
-    src/ui/managers/settings_manager.cpp
-    src/ui/managers/operation_manager.cpp
-    
-    # Utilities
-    src/ui/utils/animation_utils.cpp
-    src/ui/utils/style_utils.cpp
-    src/ui/utils/file_utils.cpp
-    
-    # Core integration
-    src/core/archive_handler.cpp
-    src/core/file_operations.cpp
-    src/core/compression_engine.cpp
-    
     # Application entry
-    src/application/main.cpp
+    src/main.cpp
 )
 
-# Header files
+# Header files (minimal working set)
 set(GUI_HEADERS
-    # Main window
-    src/ui/windows/modern_main_window.h
-    
-    # Components
-    src/ui/components/unified_drop_zone.h
-    src/ui/components/modern_toolbar.h
-    src/ui/components/smart_status_bar.h
-    src/ui/components/modern_button.h
-    src/ui/components/animated_widget.h
-    src/ui/components/progress_indicator.h
-    
-    # Views
-    src/ui/views/modern_welcome_view.h
-    src/ui/views/archive_browser_view.h
-    src/ui/views/settings_view.h
-    src/ui/views/extraction_view.h
-    
-    # Managers
-    src/ui/managers/keyboard_shortcut_manager.h
-    src/ui/managers/theme_manager.h
-    src/ui/managers/settings_manager.h
-    src/ui/managers/operation_manager.h
-    
-    # Utilities
-    src/ui/utils/animation_utils.h
-    src/ui/utils/style_utils.h
-    src/ui/utils/file_utils.h
-    
-    # Core integration
-    src/core/archive_handler.h
-    src/core/file_operations.h
-    src/core/compression_engine.h
+    # No headers needed for simple main.cpp
 )
 
-# Resource files
-set(GUI_RESOURCES
-    resources/icons.qrc
-    resources/styles.qrc
-    resources/translations.qrc
-)
+# Resource files (commented out for minimal build)
+# set(GUI_RESOURCES
+#     resources/simple.qrc
+# )
 
 # Create the executable
 add_executable(FluxGUI
     ${GUI_SOURCES}
     ${GUI_HEADERS}
-    ${GUI_RESOURCES}
+    # ${GUI_RESOURCES}  # Commented out for minimal build
 )
 
 # Link Qt6 libraries

@@ -36,11 +36,11 @@ namespace Flux {
 
     std::map<ArchiveFormat, std::string> getSupportedFormatsInfo() {
         return {
-            {ArchiveFormat::ZIP, "ZIP - 通用压缩格式，广泛兼容"},
-            {ArchiveFormat::TAR_ZSTD, "TAR+ZSTD - 高性能压缩，推荐格式"},
-            {ArchiveFormat::TAR_GZ, "TAR+GZIP - 传统Unix压缩格式"},
-            {ArchiveFormat::TAR_XZ, "TAR+XZ - 高压缩比格式"},
-            {ArchiveFormat::SEVEN_ZIP, "7-Zip - 高压缩比专业格式"}
+            {ArchiveFormat::ZIP, "ZIP - Universal compression format with wide compatibility"},
+            {ArchiveFormat::TAR_ZSTD, "TAR+ZSTD - High-performance compression, recommended format"},
+            {ArchiveFormat::TAR_GZ, "TAR+GZIP - Traditional Unix compression format"},
+            {ArchiveFormat::TAR_XZ, "TAR+XZ - High compression ratio format"},
+            {ArchiveFormat::SEVEN_ZIP, "7-Zip - High compression ratio professional format"}
         };
     }
 }

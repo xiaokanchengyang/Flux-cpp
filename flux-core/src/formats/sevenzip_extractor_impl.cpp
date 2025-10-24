@@ -31,7 +31,7 @@ namespace Flux {
             ExtractResult extractPartial(
                 const std::filesystem::path& archive_path,
                 const std::filesystem::path& output_dir,
-                const std::vector<std::string>& file_patterns,
+                std::span<const std::string> file_patterns,
                 const ExtractOptions& options,
                 const ProgressCallback& on_progress,
                 const ErrorCallback& on_error) override {
@@ -42,28 +42,28 @@ namespace Flux {
                 return result;
             }
 
-            std::vector<ArchiveEntry> listContents(
+            Flux::expected<std::vector<ArchiveEntry>, std::string> listContents(
                 const std::filesystem::path& archive_path,
-                const std::string& password) override {
+                std::string_view password) override {
                 
-                throw UnsupportedFormatException("7-Zip content listing not yet implemented");
+                return Flux::unexpected<std::string>{"7-Zip content listing not yet implemented"};
             }
 
-            ArchiveInfo getArchiveInfo(
+            Flux::expected<ArchiveInfo, std::string> getArchiveInfo(
                 const std::filesystem::path& archive_path,
-                const std::string& password) override {
+                std::string_view password) override {
                 
-                throw UnsupportedFormatException("7-Zip archive info not yet implemented");
+                return Flux::unexpected<std::string>{"7-Zip archive info not yet implemented"};
             }
 
-            std::pair<bool, std::string> verifyIntegrity(
+            Flux::expected<void, std::string> verifyIntegrity(
                 const std::filesystem::path& archive_path,
-                const std::string& password) override {
+                std::string_view password) override {
                 
-                return {false, "7-Zip integrity verification not yet implemented"};
+                return Flux::unexpected<std::string>{"7-Zip integrity verification not yet implemented"};
             }
 
-            ArchiveFormat detectFormat(
+            Flux::expected<ArchiveFormat, std::string> detectFormat(
                 const std::filesystem::path& archive_path) override {
                 
                 return ArchiveFormat::SEVEN_ZIP;

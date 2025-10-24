@@ -27,8 +27,10 @@ namespace Flux {
                 auto start_time = std::chrono::high_resolution_clock::now();
                 PackResult result;
                 result.success = false;
-                result.files_packed = 0;
-                result.total_size = 0;
+                result.files_processed = 0;
+                result.total_compressed_size = 0;
+                result.total_uncompressed_size = 0;
+                result.compression_ratio = 0.0;
 
                 // Create output directory if needed
                 std::filesystem::create_directories(output.parent_path());
@@ -124,8 +126,8 @@ namespace Flux {
                             }
 
                             // Update statistics
-                            result.files_packed++;
-                            result.total_size += std::filesystem::file_size(file_path);
+                            result.files_processed++;
+                            result.total_uncompressed_size += std::filesystem::file_size(file_path);
                             processed_files++;
 
                             spdlog::debug("Added file to ZIP: {} -> {}", file_path.string(), archive_path);
@@ -151,7 +153,7 @@ namespace Flux {
                         spdlog::info("ZIP packing cancelled");
                     } else {
                         result.success = true;
-                        spdlog::info("Successfully packed {} files into ZIP archive", result.files_packed);
+                        spdlog::info("Successfully packed {} files into ZIP archive", result.files_processed);
                     }
 
                 } catch (const std::exception& e) {
@@ -164,6 +166,21 @@ namespace Flux {
                     result.error_message = fmt::format("Cannot close ZIP archive: {}", zip_strerror(archive));
                     result.success = false;
                     spdlog::error("Failed to close ZIP archive: {}", result.error_message);
+                } else if (result.success) {
+                    // Calculate final compressed size and compression ratio
+                    try {
+                        result.total_compressed_size = std::filesystem::file_size(output);
+                        if (result.total_uncompressed_size > 0) {
+                            result.compression_ratio = static_cast<double>(result.total_compressed_size) / 
+                                                     static_cast<double>(result.total_uncompressed_size);
+                        }
+                        spdlog::info("ZIP compression ratio: {:.2f}% ({} -> {} bytes)", 
+                                   result.compression_ratio * 100.0, 
+                                   result.total_uncompressed_size, 
+                                   result.total_compressed_size);
+                    } catch (const std::exception& e) {
+                        spdlog::warn("Cannot calculate compressed size: {}", e.what());
+                    }
                 }
                 
                 auto end_time = std::chrono::high_resolution_clock::now();

@@ -1,207 +1,306 @@
-# Flux-GUI Graphical User Interface Application
-cmake_minimum_required(VERSION 3.22)
-project(FluxGUI VERSION 1.0.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.20)
 
-# Find Qt6 components
-find_package(Qt6 REQUIRED COMPONENTS 
-    Core 
-    Widgets 
+project(FluxGUI 
+    VERSION 2.0.0
+    DESCRIPTION "Modern GUI for Flux Archive Manager"
+    LANGUAGES CXX
+)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Find required Qt6 components
+find_package(Qt6 REQUIRED COMPONENTS
+    Core
+    Widgets
+    Gui
     Concurrent
     Network
-    Charts
+    Svg
 )
 
-# Create executable
-add_executable(flux-gui
-    src/main.cpp
-    
-    # Main UI components
-    src/ui/main_window.cpp
-    src/ui/main_window.h
-    
-    # Core systems
-    src/core/theme/theme_manager.cpp
-    src/core/theme/theme_manager.h
-    src/core/config/settings_manager.cpp
-    src/core/config/settings_manager.h
-    src/core/archive/archive_manager.cpp
-    src/core/archive/archive_manager.h
-    
-    # Modern UI widgets
-    src/ui/widgets/welcome_widget.cpp
-    src/ui/widgets/welcome_widget.h
-    src/ui/widgets/archive_explorer_widget.cpp
-    src/ui/widgets/archive_explorer_widget.h
-    src/ui/widgets/compression_widget.cpp
-    src/ui/widgets/compression_widget.h
-    src/ui/widgets/extraction_widget.cpp
-    src/ui/widgets/extraction_widget.h
-    src/ui/widgets/settings_widget.cpp
-    src/ui/widgets/settings_widget.h
-    src/ui/widgets/progress_widget.cpp
-    src/ui/widgets/progress_widget.h
-    
-    # UI components
-    src/ui/components/modern_toolbar.cpp
-    src/ui/components/modern_toolbar.h
-    src/ui/components/status_bar.cpp
-    src/ui/components/status_bar.h
-    src/ui/components/file_tree_view.cpp
-    src/ui/components/file_tree_view.h
-    src/ui/components/archive_info_panel.cpp
-    src/ui/components/archive_info_panel.h
-    
-    # Platform integration
-    src/platform/system_integration.cpp
-    src/platform/system_integration.h
-    
-    # Utility classes
-    src/utils/file_utils.cpp
-    src/utils/file_utils.h
-    src/utils/resource_manager.cpp
-    src/utils/resource_manager.h
-    src/utils/ui_utils.cpp
-    src/utils/ui_utils.h
-    
-    # Model classes
-    src/models/archive_model.cpp
-    src/models/archive_model.h
-    src/models/file_system_model.cpp
-    src/models/file_system_model.h
-    
-    # Dialogs
-    src/ui/dialogs/about_dialog.cpp
-    src/ui/dialogs/about_dialog.h
-    src/ui/dialogs/preferences_dialog.cpp
-    src/ui/dialogs/preferences_dialog.h
-    
-    # Resource files
-    resources/resources.qrc
-)
+# Enable Qt6 features
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
-# Link dependencies
-target_link_libraries(flux-gui PRIVATE 
-    Qt6::Core
-    Qt6::Widgets
-    Qt6::Concurrent
-    Qt6::Network
-    Qt6::Charts
-    flux-core
-)
+# Compiler-specific options
+if(MSVC)
+    add_compile_options(/W4 /permissive- /Zc:__cplusplus)
+    add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+else()
+    add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# Debug/Release configurations
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(DEBUG_BUILD)
+    if(NOT MSVC)
+        add_compile_options(-g -O0)
+    endif()
+else()
+    add_compile_definitions(NDEBUG)
+    if(NOT MSVC)
+        add_compile_options(-O3 -DNDEBUG)
+    endif()
+endif()
 
 # Include directories
-target_include_directories(flux-gui PRIVATE
+include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-# Platform-specific settings
+# Source files
+set(GUI_SOURCES
+    # Main window
+    src/ui/modern_main_window.cpp
+    
+    # Components
+    src/ui/components/unified_drop_zone.cpp
+    src/ui/components/modern_toolbar.cpp
+    src/ui/components/smart_status_bar.cpp
+    src/ui/components/modern_button.cpp
+    src/ui/components/animated_widget.cpp
+    src/ui/components/progress_indicator.cpp
+    
+    # Views
+    src/ui/views/modern_welcome_view.cpp
+    src/ui/views/archive_browser_view.cpp
+    src/ui/views/settings_view.cpp
+    src/ui/views/extraction_view.cpp
+    
+    # Managers
+    src/ui/managers/keyboard_shortcut_manager.cpp
+    src/ui/managers/theme_manager.cpp
+    src/ui/managers/settings_manager.cpp
+    src/ui/managers/operation_manager.cpp
+    
+    # Utilities
+    src/ui/utils/animation_utils.cpp
+    src/ui/utils/style_utils.cpp
+    src/ui/utils/file_utils.cpp
+    
+    # Core integration
+    src/core/archive_handler.cpp
+    src/core/file_operations.cpp
+    src/core/compression_engine.cpp
+    
+    # Application entry
+    src/main.cpp
+)
+
+# Header files
+set(GUI_HEADERS
+    # Main window
+    src/ui/modern_main_window.h
+    
+    # Components
+    src/ui/components/unified_drop_zone.h
+    src/ui/components/modern_toolbar.h
+    src/ui/components/smart_status_bar.h
+    src/ui/components/modern_button.h
+    src/ui/components/animated_widget.h
+    src/ui/components/progress_indicator.h
+    
+    # Views
+    src/ui/views/modern_welcome_view.h
+    src/ui/views/archive_browser_view.h
+    src/ui/views/settings_view.h
+    src/ui/views/extraction_view.h
+    
+    # Managers
+    src/ui/managers/keyboard_shortcut_manager.h
+    src/ui/managers/theme_manager.h
+    src/ui/managers/settings_manager.h
+    src/ui/managers/operation_manager.h
+    
+    # Utilities
+    src/ui/utils/animation_utils.h
+    src/ui/utils/style_utils.h
+    src/ui/utils/file_utils.h
+    
+    # Core integration
+    src/core/archive_handler.h
+    src/core/file_operations.h
+    src/core/compression_engine.h
+)
+
+# Resource files
+set(GUI_RESOURCES
+    resources/icons.qrc
+    resources/styles.qrc
+    resources/translations.qrc
+)
+
+# Create the executable
+add_executable(FluxGUI
+    ${GUI_SOURCES}
+    ${GUI_HEADERS}
+    ${GUI_RESOURCES}
+)
+
+# Link Qt6 libraries
+target_link_libraries(FluxGUI
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Gui
+    Qt6::Concurrent
+    Qt6::Network
+    Qt6::Svg
+)
+
+# Platform-specific libraries
 if(WIN32)
-    # Windows-specific settings
-    target_compile_definitions(flux-gui PRIVATE
-        _CRT_SECURE_NO_WARNINGS
-        NOMINMAX
-        WIN32_LEAN_AND_MEAN
-        UNICODE
-        _UNICODE
+    target_link_libraries(FluxGUI
+        user32
+        shell32
+        ole32
+        oleaut32
+        uuid
+        advapi32
     )
-    # Set as Windows application (not console)
-    set_target_properties(flux-gui PROPERTIES
-        WIN32_EXECUTABLE TRUE
+elseif(UNIX AND NOT APPLE)
+    target_link_libraries(FluxGUI
+        pthread
+        dl
     )
-    
-    # Add Windows resource file if it exists
-    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/resources/flux.rc")
-        target_sources(flux-gui PRIVATE resources/flux.rc)
-    endif()
-    
 elseif(APPLE)
-    # macOS-specific settings
-    set_target_properties(flux-gui PROPERTIES
-        MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/Info.plist.in"
-        MACOSX_BUNDLE_BUNDLE_NAME "Flux"
-        MACOSX_BUNDLE_DISPLAY_NAME "Flux Archive Manager"
-        MACOSX_BUNDLE_IDENTIFIER "com.flux.archiver"
-        MACOSX_BUNDLE_VERSION "1.0.0"
-        MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0"
-    )
-    
-elseif(UNIX)
-    # Linux-specific settings
-    # Enable RPATH for finding shared libraries
-    set_target_properties(flux-gui PROPERTIES
-        INSTALL_RPATH_USE_LINK_PATH TRUE
+    target_link_libraries(FluxGUI
+        "-framework CoreFoundation"
+        "-framework CoreServices"
+        "-framework AppKit"
     )
 endif()
+
+# Compiler definitions
+target_compile_definitions(FluxGUI PRIVATE
+    QT_NO_KEYWORDS
+    QT_DISABLE_DEPRECATED_BEFORE=0x060000
+    FLUX_GUI_VERSION="${PROJECT_VERSION}"
+    FLUX_GUI_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
+    FLUX_GUI_VERSION_MINOR=${PROJECT_VERSION_MINOR}
+    FLUX_GUI_VERSION_PATCH=${PROJECT_VERSION_PATCH}
+)
 
 # Set target properties
-set_target_properties(flux-gui PROPERTIES
-    CXX_STANDARD 23
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS OFF
-    OUTPUT_NAME "FluxGUI"
-    AUTOMOC ON
-    AUTORCC ON
-    AUTOUIC ON
+set_target_properties(FluxGUI PROPERTIES
+    WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE TRUE
+    OUTPUT_NAME "FluxArchiveManager"
 )
 
-# Platform-specific deployment
+# Installation
+install(TARGETS FluxGUI
+    BUNDLE DESTINATION .
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
+
+# Windows-specific installation
 if(WIN32)
-    # Find Qt6 deployment tool
-    find_program(QT_DEPLOY_EXECUTABLE windeployqt HINTS ${Qt6_DIR}/../../../bin)
-    
-    if(QT_DEPLOY_EXECUTABLE)
-        add_custom_command(TARGET flux-gui POST_BUILD
-            COMMAND ${QT_DEPLOY_EXECUTABLE} $<TARGET_FILE:flux-gui>
-            COMMENT "Deploying Qt libraries for Windows"
-        )
-    endif()
-    
-elseif(APPLE)
-    # Find Qt6 deployment tool for macOS
-    find_program(QT_DEPLOY_EXECUTABLE macdeployqt HINTS ${Qt6_DIR}/../../../bin)
-    
-    if(QT_DEPLOY_EXECUTABLE)
-        add_custom_command(TARGET flux-gui POST_BUILD
-            COMMAND ${QT_DEPLOY_EXECUTABLE} $<TARGET_BUNDLE_DIR:flux-gui>
-            COMMENT "Deploying Qt libraries for macOS"
-        )
+    # Install Qt6 runtime libraries
+    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS ${Qt6_DIR}/../../../bin)
+    if(WINDEPLOYQT_EXECUTABLE)
+        install(CODE "
+            execute_process(
+                COMMAND ${WINDEPLOYQT_EXECUTABLE} --verbose 2 --no-compiler-runtime \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin/FluxArchiveManager.exe
+            )
+        ")
     endif()
 endif()
 
-# Installation rules
-if(WIN32)
-    install(TARGETS flux-gui
-        RUNTIME DESTINATION .
-        COMPONENT gui
-    )
-elseif(APPLE)
-    install(TARGETS flux-gui
-        BUNDLE DESTINATION .
-        COMPONENT gui
-    )
-else()
-    install(TARGETS flux-gui
-        RUNTIME DESTINATION bin
-        COMPONENT gui
+# macOS-specific installation
+if(APPLE)
+    find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS ${Qt6_DIR}/../../../bin)
+    if(MACDEPLOYQT_EXECUTABLE)
+        install(CODE "
+            execute_process(
+                COMMAND ${MACDEPLOYQT_EXECUTABLE} \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/FluxArchiveManager.app
+            )
+        ")
+    endif()
+endif()
+
+# Create desktop entry for Linux
+if(UNIX AND NOT APPLE)
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/flux-archive-manager.desktop.in
+        ${CMAKE_CURRENT_BINARY_DIR}/flux-archive-manager.desktop
+        @ONLY
     )
     
-    # Install desktop file (Linux)
-    install(FILES resources/flux.desktop
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/flux-archive-manager.desktop
         DESTINATION share/applications
-        COMPONENT gui
     )
     
-    # Install icon
-    install(FILES resources/icons/flux.png
-        DESTINATION share/icons/hicolor/256x256/apps
-        COMPONENT gui
-    )
-    
-    # Install MIME type information
-    install(FILES resources/flux-mimetypes.xml
-        DESTINATION share/mime/packages
-        COMPONENT gui
-        OPTIONAL
+    install(FILES resources/icons/flux-archive-manager.png
+        DESTINATION share/pixmaps
     )
 endif()
+
+# CPack configuration for packaging
+include(CPack)
+set(CPACK_PACKAGE_NAME "FluxArchiveManager")
+set(CPACK_PACKAGE_VENDOR "Flux Development Team")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Modern Archive Management Tool")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "FluxArchiveManager")
+
+if(WIN32)
+    set(CPACK_GENERATOR "NSIS;ZIP")
+    set(CPACK_NSIS_DISPLAY_NAME "Flux Archive Manager")
+    set(CPACK_NSIS_PACKAGE_NAME "FluxArchiveManager")
+    set(CPACK_NSIS_CONTACT "support@flux-archive.com")
+    set(CPACK_NSIS_URL_INFO_ABOUT "https://flux-archive.com")
+elseif(APPLE)
+    set(CPACK_GENERATOR "DragNDrop;TGZ")
+    set(CPACK_DMG_FORMAT "UDBZ")
+    set(CPACK_DMG_VOLUME_NAME "FluxArchiveManager")
+else()
+    set(CPACK_GENERATOR "DEB;RPM;TGZ")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Flux Development Team")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libqt6core6, libqt6widgets6, libqt6gui6")
+    set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+    set(CPACK_RPM_PACKAGE_GROUP "Applications/Archiving")
+endif()
+
+# Development tools
+option(BUILD_TESTS "Build test suite" OFF)
+option(BUILD_DOCS "Build documentation" OFF)
+option(ENABLE_COVERAGE "Enable code coverage" OFF)
+
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
+
+if(BUILD_DOCS)
+    find_package(Doxygen)
+    if(DOXYGEN_FOUND)
+        add_subdirectory(docs)
+    endif()
+endif()
+
+if(ENABLE_COVERAGE AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(CMAKE_COMPILER_IS_GNUCXX)
+        target_compile_options(FluxGUI PRIVATE --coverage)
+        target_link_libraries(FluxGUI --coverage)
+    endif()
+endif()
+
+# Print configuration summary
+message(STATUS "")
+message(STATUS "Flux GUI Configuration Summary:")
+message(STATUS "  Version: ${PROJECT_VERSION}")
+message(STATUS "  Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "  C++ standard: ${CMAKE_CXX_STANDARD}")
+message(STATUS "  Qt6 version: ${Qt6_VERSION}")
+message(STATUS "  Install prefix: ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "  Build tests: ${BUILD_TESTS}")
+message(STATUS "  Build docs: ${BUILD_DOCS}")
+message(STATUS "  Enable coverage: ${ENABLE_COVERAGE}")
+message(STATUS "")

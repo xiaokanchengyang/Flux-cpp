@@ -1,177 +1,146 @@
 #pragma once
 
 #include <QWidget>
+#include <QHBoxLayout>
+#include <QToolButton>
+#include <QLabel>
+#include <QPropertyAnimation>
+#include <QButtonGroup>
+#include <QMenu>
+#include <QAction>
+#include <memory>
 
-class QHBoxLayout;
-class QPushButton;
-class QButtonGroup;
-class QLabel;
-class QPropertyAnimation;
+QT_BEGIN_NAMESPACE
+class QResizeEvent;
+class QPaintEvent;
+QT_END_NAMESPACE
 
 namespace FluxGUI::UI::Components {
 
 /**
- * @brief Modern navigation toolbar with mode switching
+ * Modern Toolbar Component
  * 
- * The ModernToolbar provides:
- * - Mode-based navigation (Welcome, Explorer, Compression, Extraction)
- * - Dynamic title and breadcrumb display
- * - Smooth animations and transitions
- * - Action buttons for common operations
+ * Provides a clean, context-aware toolbar with smooth animations
+ * and adaptive layout that changes based on current application state.
  */
 class ModernToolbar : public QWidget {
     Q_OBJECT
 
 public:
-    /**
-     * @brief Toolbar modes corresponding to application states
-     */
-    enum class Mode {
-        Welcome = 0,        // Welcome/home screen
-        Explorer = 1,       // Archive explorer
-        Compression = 2,    // Archive creation
-        Extraction = 3,     // Archive extraction
-        Settings = 4        // Application settings
+    enum class ToolbarMode {
+        Welcome,        // Initial state with basic actions
+        Archive,        // Archive browsing with archive-specific actions
+        Creation,       // Archive creation mode
+        Extraction,     // Archive extraction mode
+        Settings        // Settings view
     };
 
-    /**
-     * @brief Construct the modern toolbar
-     * @param parent Parent widget
-     */
     explicit ModernToolbar(QWidget* parent = nullptr);
-    
-    /**
-     * @brief Destructor
-     */
     ~ModernToolbar() override;
 
-public slots:
-    /**
-     * @brief Set the current mode
-     * @param mode New mode
-     */
-    void setMode(Mode mode);
-    
-    /**
-     * @brief Set the toolbar title
-     * @param title New title
-     */
-    void setTitle(const QString& title);
-    
-    /**
-     * @brief Set the breadcrumb text
-     * @param breadcrumb Breadcrumb text
-     */
-    void setBreadcrumb(const QString& breadcrumb);
+    // Mode management
+    void setMode(ToolbarMode mode);
+    ToolbarMode currentMode() const { return m_currentMode; }
 
-public:
-    /**
-     * @brief Get the current mode
-     * @return Current mode
-     */
-    Mode currentMode() const;
+    // Action management
+    void addAction(QAction* action, const QString& tooltip = QString());
+    void addSeparator();
+    void addWidget(QWidget* widget);
+    void clearActions();
+
+    // State management
+    void setBackButtonVisible(bool visible);
+    void setTitle(const QString& title);
+    void setSubtitle(const QString& subtitle);
 
 signals:
-    /**
-     * @brief Emitted when mode changes
-     * @param newMode New mode
-     * @param previousMode Previous mode
-     */
-    void modeChanged(int newMode, int previousMode);
+    // Navigation signals
+    void backRequested();
+    void homeRequested();
+    void settingsRequested();
     
-    /**
-     * @brief Emitted when mode change is requested
-     * @param mode Requested mode
-     */
-    void modeChangeRequested(int mode);
+    // Action signals
+    void newArchiveRequested();
+    void openArchiveRequested();
+    void extractAllRequested();
+    void addFilesRequested();
+    void removeFilesRequested();
+    
+    // View signals
+    void viewModeChanged(int mode);
+
+protected:
+    void paintEvent(QPaintEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
+
+private slots:
+    void onBackClicked();
+    void onHomeClicked();
+    void onSettingsClicked();
+    void onModeAnimationFinished();
 
 private:
-    /**
-     * @brief Initialize the user interface
-     */
+    // UI setup
     void initializeUI();
-    
-    /**
-     * @brief Create navigation section
-     * @param layout Target layout
-     */
-    void createNavigationSection(QHBoxLayout* layout);
-    
-    /**
-     * @brief Create title section
-     * @param layout Target layout
-     */
-    void createTitleSection(QHBoxLayout* layout);
-    
-    /**
-     * @brief Create action section
-     * @param layout Target layout
-     */
-    void createActionSection(QHBoxLayout* layout);
-    
-    /**
-     * @brief Create a mode button
-     * @param iconPath Icon file path
-     * @param text Button text
-     * @param mode Associated mode
-     * @param parent Parent widget
-     * @return Created button
-     */
-    QPushButton* createModeButton(const QString& iconPath, const QString& text, 
-                                Mode mode, QWidget* parent);
-    
-    /**
-     * @brief Create an action button
-     * @param iconPath Icon file path
-     * @param text Tooltip text
-     * @param parent Parent widget
-     * @return Created button
-     */
-    QPushButton* createActionButton(const QString& iconPath, const QString& text, 
-                                  QWidget* parent);
-    
-    /**
-     * @brief Connect signals and slots
-     */
-    void connectSignals();
-    
-    /**
-     * @brief Update button states
-     */
-    void updateButtonStates();
-    
-    /**
-     * @brief Update title and breadcrumb
-     */
-    void updateTitleAndBreadcrumb();
-    
-    /**
-     * @brief Animate mode transition
-     */
-    void animateTransition();
-    
-    /**
-     * @brief Apply styling
-     */
+    void createNavigationSection();
+    void createTitleSection();
+    void createActionSection();
+    void createModeButtons();
+    void setupAnimations();
     void applyStyles();
+    
+    // Mode management
+    void updateModeActions();
+    void animateModeChange();
+    void showModeSpecificActions();
+    void hideModeSpecificActions();
+    
+    // Layout management
+    void updateLayout();
+    void adjustButtonSizes();
 
 private:
-    Mode m_currentMode;
+    // Layout components
+    QHBoxLayout* m_mainLayout{nullptr};
+    QWidget* m_navigationSection{nullptr};
+    QWidget* m_titleSection{nullptr};
+    QWidget* m_actionSection{nullptr};
     
     // Navigation buttons
-    QPushButton* m_welcomeButton;
-    QPushButton* m_explorerButton;
-    QPushButton* m_compressionButton;
-    QPushButton* m_extractionButton;
-    QPushButton* m_settingsButton;
-    QButtonGroup* m_modeButtonGroup;
+    QToolButton* m_backButton{nullptr};
+    QToolButton* m_homeButton{nullptr};
+    QToolButton* m_settingsButton{nullptr};
     
-    // Title section
-    QLabel* m_titleLabel;
-    QLabel* m_breadcrumbLabel;
+    // Title display
+    QLabel* m_titleLabel{nullptr};
+    QLabel* m_subtitleLabel{nullptr};
     
-    // Animation
-    QPropertyAnimation* m_fadeAnimation;
+    // Action buttons
+    QToolButton* m_newArchiveButton{nullptr};
+    QToolButton* m_openArchiveButton{nullptr};
+    QToolButton* m_extractAllButton{nullptr};
+    QToolButton* m_addFilesButton{nullptr};
+    QToolButton* m_removeFilesButton{nullptr};
+    
+    // Mode selection
+    QButtonGroup* m_modeButtonGroup{nullptr};
+    QWidget* m_modeButtonContainer{nullptr};
+    
+    // State management
+    ToolbarMode m_currentMode{ToolbarMode::Welcome};
+    QString m_currentTitle;
+    QString m_currentSubtitle;
+    bool m_backButtonVisible{false};
+    
+    // Animations
+    std::unique_ptr<QPropertyAnimation> m_modeAnimation;
+    std::unique_ptr<QPropertyAnimation> m_titleAnimation;
+    
+    // Constants
+    static constexpr int TOOLBAR_HEIGHT = 64;
+    static constexpr int BUTTON_SIZE = 40;
+    static constexpr int SPACING = 12;
+    static constexpr int ANIMATION_DURATION = 250;
 };
 
 } // namespace FluxGUI::UI::Components

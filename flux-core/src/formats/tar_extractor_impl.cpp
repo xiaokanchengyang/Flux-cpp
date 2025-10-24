@@ -31,7 +31,7 @@ namespace Flux {
             ExtractResult extractPartial(
                 const std::filesystem::path& archive_path,
                 const std::filesystem::path& output_dir,
-                const std::vector<std::string>& file_patterns,
+                std::span<const std::string> file_patterns,
                 const ExtractOptions& options,
                 const ProgressCallback& on_progress,
                 const ErrorCallback& on_error) override {
@@ -42,35 +42,41 @@ namespace Flux {
                 return result;
             }
 
-            std::vector<ArchiveEntry> listContents(
+            Flux::expected<std::vector<ArchiveEntry>, std::string> listContents(
                 const std::filesystem::path& archive_path,
-                const std::string& password) override {
+                std::string_view password) override {
                 
-                throw UnsupportedFormatException("TAR content listing not yet implemented");
+                return Flux::unexpected<std::string>{"TAR content listing not yet implemented"};
             }
 
-            ArchiveInfo getArchiveInfo(
+            Flux::expected<ArchiveInfo, std::string> getArchiveInfo(
                 const std::filesystem::path& archive_path,
-                const std::string& password) override {
+                std::string_view password) override {
                 
-                throw UnsupportedFormatException("TAR archive info not yet implemented");
+                return Flux::unexpected<std::string>{"TAR archive info not yet implemented"};
             }
 
-            std::pair<bool, std::string> verifyIntegrity(
+            Flux::expected<void, std::string> verifyIntegrity(
                 const std::filesystem::path& archive_path,
-                const std::string& password) override {
+                std::string_view password) override {
                 
-                return {false, "TAR integrity verification not yet implemented"};
+                return Flux::unexpected<std::string>{"TAR integrity verification not yet implemented"};
             }
 
-            ArchiveFormat detectFormat(
+            Flux::expected<ArchiveFormat, std::string> detectFormat(
                 const std::filesystem::path& archive_path) override {
                 
-                std::string ext = archive_path.extension().string();
-                if (ext == ".gz") return ArchiveFormat::TAR_GZ;
-                if (ext == ".xz") return ArchiveFormat::TAR_XZ;
-                if (ext == ".zst") return ArchiveFormat::TAR_ZSTD;
-                return ArchiveFormat::TAR_GZ; // Default
+                std::string filename = archive_path.filename().string();
+                if (filename.ends_with(".tar.gz") || filename.ends_with(".tgz")) {
+                    return ArchiveFormat::TAR_GZ;
+                }
+                if (filename.ends_with(".tar.xz") || filename.ends_with(".txz")) {
+                    return ArchiveFormat::TAR_XZ;
+                }
+                if (filename.ends_with(".tar.zst") || filename.ends_with(".tar.zstd")) {
+                    return ArchiveFormat::TAR_ZSTD;
+                }
+                return Flux::unexpected<std::string>{"Cannot detect TAR format from filename"};
             }
 
             void cancel() override {

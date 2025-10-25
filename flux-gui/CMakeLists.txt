@@ -19,6 +19,8 @@ find_package(Qt6 REQUIRED COMPONENTS
     Concurrent
     Network
     Svg
+    Multimedia
+    DBus
 )
 
 # Enable Qt6 features
@@ -53,27 +55,153 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-# Source files (minimal working set)
+# Source files - Complete GUI Implementation
 set(GUI_SOURCES
     # Application entry
-    src/main.cpp
+    src/application/main.cpp
+    
+    # Enhanced Main Window
+    src/ui/enhanced_main_window.cpp
+    
+    # Core Components
+    src/ui/components/smart_navigation_panel.cpp
+    src/ui/components/visual_feedback_manager.cpp
+    src/ui/components/rich_file_display.cpp
+    src/ui/components/virtualized_archive_view.cpp
+    src/ui/components/context_menu_manager.cpp
+    src/ui/components/modern_toolbar.cpp
+    src/ui/components/smart_status_bar.cpp
+    src/ui/components/unified_drop_zone.cpp
+    
+    # Managers
+    src/ui/managers/accessibility_manager.cpp
+    src/ui/managers/theme_manager.cpp
+    src/ui/managers/keyboard_shortcut_manager.cpp
+    
+    # Dialogs
+    src/ui/dialogs/batch_operations_dialog.cpp
+    src/ui/dialogs/smart_compression_dialog.cpp
+    src/ui/dialogs/smart_extraction_dialog.cpp
+    
+    # Views
+    src/ui/views/archive_browser_view.cpp
+    src/ui/views/settings_view.cpp
+    src/views/browse_page.cpp
+    src/views/browse_view.cpp
+    src/views/extract_view.cpp
+    src/views/pack_view.cpp
+    src/views/settings_page.cpp
+    src/views/welcome_view.cpp
+    
+    # Widgets
+    src/ui/widgets/archive_explorer_widget.cpp
+    src/ui/widgets/compression_widget.cpp
+    src/ui/widgets/welcome_widget.cpp
+    
+    # Windows
+    src/ui/windows/main_window.cpp
+    src/ui/windows/mainwindow.cpp
+    src/ui/windows/modern_main_window.cpp
+    
+    # Models
+    src/models/archive_model.cpp
+    src/models/virtual_archive_model.cpp
+    
+    # Core
+    src/core/async_worker.cpp
+    src/core/task_executor.cpp
+    src/core/theme/theme_manager.cpp
+    src/core/config/settings_manager.cpp
+    src/core/archive/archive_manager.cpp
+    
+    # Utils
+    src/utils/file_utils.cpp
+    src/utils/resource_manager.cpp
 )
 
-# Header files (minimal working set)
+# Header files - Complete GUI Implementation
 set(GUI_HEADERS
-    # No headers needed for simple main.cpp
+    # Enhanced Main Window
+    src/ui/enhanced_main_window.h
+    
+    # Core Components
+    src/ui/components/smart_navigation_panel.h
+    src/ui/components/visual_feedback_manager.h
+    src/ui/components/rich_file_display.h
+    src/ui/components/virtualized_archive_view.h
+    src/ui/components/context_menu_manager.h
+    src/ui/components/modern_toolbar.h
+    src/ui/components/smart_status_bar.h
+    src/ui/components/unified_drop_zone.h
+    src/ui/components/operation_dispatcher.h
+    
+    # Managers
+    src/ui/managers/accessibility_manager.h
+    src/ui/managers/theme_manager.h
+    src/ui/managers/keyboard_shortcut_manager.h
+    src/ui/managers/context_menu_manager.h
+    
+    # Dialogs
+    src/ui/dialogs/batch_operations_dialog.h
+    src/ui/dialogs/smart_compression_dialog.h
+    src/ui/dialogs/smart_extraction_dialog.h
+    
+    # Views
+    src/ui/views/archive_browser_view.h
+    src/ui/views/settings_view.h
+    src/ui/views/modern_welcome_view.h
+    src/views/browse_page.h
+    src/views/browse_view.h
+    src/views/extract_view.h
+    src/views/pack_view.h
+    src/views/settings_page.h
+    src/views/welcome_view.h
+    
+    # Widgets
+    src/ui/widgets/archive_explorer_widget.h
+    src/ui/widgets/compression_widget.h
+    src/ui/widgets/extraction_widget.h
+    src/ui/widgets/settings_widget.h
+    src/ui/widgets/welcome_widget.h
+    
+    # Windows
+    src/ui/windows/main_window.h
+    src/ui/windows/mainwindow.h
+    src/ui/windows/modern_main_window.h
+    
+    # Models
+    src/models/archive_model.h
+    src/models/virtual_archive_model.h
+    
+    # Core
+    src/core/async_task_executor.h
+    src/core/async_worker.h
+    src/core/asyncworker.h
+    src/core/task_executor.h
+    src/core/theme/theme_manager.h
+    src/core/config/settings_manager.h
+    src/core/archive/archive_manager.h
+    
+    # Utils
+    src/utils/file_utils.h
+    src/utils/resource_manager.h
+    
+    # Platform
+    src/platform/system_integration.h
 )
 
-# Resource files (commented out for minimal build)
-# set(GUI_RESOURCES
-#     resources/simple.qrc
-# )
+# Resource files - Complete GUI Resources
+set(GUI_RESOURCES
+    resources/icons.qrc
+    resources/themes.qrc
+    resources/sounds.qrc
+)
 
 # Create the executable
 add_executable(FluxGUI
     ${GUI_SOURCES}
     ${GUI_HEADERS}
-    # ${GUI_RESOURCES}  # Commented out for minimal build
+    ${GUI_RESOURCES}
 )
 
 # Link Qt6 libraries
@@ -84,7 +212,13 @@ target_link_libraries(FluxGUI
     Qt6::Concurrent
     Qt6::Network
     Qt6::Svg
+    Qt6::Multimedia
 )
+
+# Platform-specific Qt6 libraries
+if(UNIX AND NOT APPLE)
+    target_link_libraries(FluxGUI Qt6::DBus)
+endif()
 
 # Platform-specific libraries
 if(WIN32)

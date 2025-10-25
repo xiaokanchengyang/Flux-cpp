@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flux Archive Manager - GUI增强效果展示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 头部导航 - 增强版 */
+        .header {
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(187, 134, 252, 0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 15px 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #bb86fc, #03dac6);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            color: #000;
+            box-shadow: 0 8px 32px rgba(187, 134, 252, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .logo-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .logo-text {
+            font-size: 26px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #bb86fc, #03dac6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 35px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #bb86fc, #03dac6);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-links a:hover {
+            color: #bb86fc;
+            background: rgba(187, 134, 252, 0.1);
+        }
+
+        .nav-links a:hover::before {
+            width: 100%;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            margin-top: 90px;
+            padding: 40px 0;
+        }
+
+        /* 英雄区域 - 增强版 */
+        .hero {
+            text-align: center;
+            padding: 100px 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(187, 134, 252, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(3, 218, 198, 0.15) 0%, transparent 50%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(187,134,252,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #bb86fc, #03dac6, #bb86fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            color: #cccccc;
+            margin-bottom: 50px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 18px 35px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #bb86fc, #985eff);
+            color: #000000;
+            box-shadow: 0 8px 32px rgba(187, 134, 252, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(187, 134, 252, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(187, 134, 252, 0.1);
+            color: #bb86fc;
+            border: 2px solid #bb86fc;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(187, 134, 252, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* GUI增强功能展示区域 */
+        .enhancements {
+            padding: 100px 0;
+            background: rgba(15, 15, 15, 0.5);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 80px;
+            color: #ffffff;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #bb86fc, #03dac6);
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .enhancements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .enhancement-card {
+            background: rgba(25, 25, 25, 0.9);
+            border: 1px solid rgba(187, 134, 252, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .enhancement-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #bb86fc, #03dac6);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .enhancement-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .enhancement-card:hover {
+            transform: translateY(-8px);
+            border-color: #bb86fc;
+            box-shadow: 0 20px 60px rgba(187, 134, 252, 0.3);
+        }
+
+        .enhancement-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #bb86fc, #03dac6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(187, 134, 252, 0.3);
+        }
+
+        .enhancement-card h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .enhancement-card p {
+            color: #cccccc;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .enhancement-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .enhancement-features li {
+            color: #bb86fc;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .enhancement-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #03dac6;
+            font-weight: bold;
+        }
+
+        /* 交互式GUI预览区域 */
+        .interactive-preview {
+            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(187, 134, 252, 0.05) 0%, rgba(3, 218, 198, 0.05) 100%);
+        }
+
+        .preview-container {
+            background: #1a1a1a;
+            border: 1px solid rgba(187, 134, 252, 0.3);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+        }
+
+        .window-header {
+            background: linear-gradient(135deg, #2d2d2d, #1e1e1e);
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(187, 134, 252, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .window-control {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .window-control:hover {
+            transform: scale(1.2);
+        }
+
+        .control-close { 
+            background: linear-gradient(135deg, #ff5f56, #ff3b30);
+            box-shadow: 0 2px 8px rgba(255, 95, 86, 0.3);
+        }
+        .control-minimize { 
+            background: linear-gradient(135deg, #ffbd2e, #ff9500);
+            box-shadow: 0 2px 8px rgba(255, 189, 46, 0.3);
+        }
+        .control-maximize { 
+            background: linear-gradient(135deg, #27ca3f, #00c851);
+            box-shadow: 0 2px 8px rgba(39, 202, 63, 0.3);
+        }
+
+        .window-title {
+            margin-left: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 16px;
+        }
+
+        .gui-content {
+            padding: 0;
+            height: 600px;
+            display: flex;
+        }
+
+        /* 智能导航面板 */
+        .smart-sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, #2d2d2d, #252525);
+            border-right: 1px solid rgba(187, 134, 252, 0.2);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(187, 134, 252, 0.1);
+        }
+
+        .sidebar-title {
+            color: #bb86fc;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .breadcrumb {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .breadcrumb-item {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb-item:hover {
+            color: #bb86fc;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            color: #cccccc;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #bb86fc, #03dac6);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .nav-item:hover {
+            background: rgba(187, 134, 252, 0.1);
+            color: #bb86fc;
+            padding-left: 25px;
+        }
+
+        .nav-item.active {
+            background: rgba(187, 134, 252, 0.2);
+            color: #bb86fc;
+            border-left-color: #bb86fc;
+        }
+
+        .nav-item.active::before {
+            transform: scaleY(1);
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .recent-files {
+            padding: 20px;
+            border-top: 1px solid rgba(187, 134, 252, 0.1);
+        }
+
+        .recent-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .recent-item {
+            padding: 8px 0;
+            color: #cccccc;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .recent-item:hover {
+            color: #bb86fc;
+        }
+
+        /* 主内容区域 */
+        .main-area {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #1e1e1e, #1a1a1a);
+        }
+
+        .content-header {
+            margin-bottom: 30px;
+        }
+
+        .content-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .content-subtitle {
+            color: #888;
+            font-size: 16px;
+        }
+
+        .demo-tabs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(187, 134, 252, 0.2);
+        }
+
+        .demo-tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .demo-tab.active {
+            color: #bb86fc;
+            border-bottom-color: #bb86fc;
+        }
+
+        .demo-tab:hover {
+            color: #bb86fc;
+        }
+
+        .demo-content {
+            flex: 1;
+            display: none;
+        }
+
+        .demo-content.active {
+            display: block;
+        }
+
+        /* 文件列表演示 */
+        .file-list-demo {
+            background: rgba(30, 30, 30, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 5px;
+        }
+
+        .file-item:hover {
+            background: rgba(187, 134, 252, 0.1);
+        }
+
+        .file-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .file-icon.folder {
+            background: linear-gradient(135deg, #ffa726, #ff9800);
+        }
+
+        .file-icon.archive {
+            background: linear-gradient(135deg, #bb86fc, #985eff);
+        }
+
+        .file-icon.document {
+            background: linear-gradient(135deg, #42a5f5, #1976d2);
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .file-meta {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .file-size {
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* 进度演示 */
+        .progress-demo {
+            background: rgba(30, 30, 30, 0.5);
+            border-radius: 12px;
+            padding: 30px;
+        }
+
+        .progress-item {
+            margin-bottom: 25px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #cccccc;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #bb86fc, #03dac6);
+            border-radius: 4px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* 通知演示 */
+        .notification-demo {
+            position: relative;
+            height: 300px;
+        }
+
+        .notification {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 30, 30, 0.95);
+            border: 1px solid rgba(187, 134, 252, 0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-width: 300px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .notification-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+        }
+
+        .notification-title {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .notification-message {
+            color: #cccccc;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .enhancements-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .gui-content {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .smart-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(187, 134, 252, 0.2);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #bb86fc, #985eff);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #985eff, #7c4dff);
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">
+                    <div class="logo-icon">F</div>
+                    <div class="logo-text">Flux Archive Manager</div>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#enhancements">GUI增强</a></li>
+                    <li><a href="#interactive-preview">交互预览</a></li>
+                    <li><a href="#features">核心功能</a></li>
+                    <li><a href="#implementation">实施指南</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 英雄区域 -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>GUI增强效果展示</h1>
+                    <p>体验Flux Archive Manager的现代化界面设计，包含智能导航、视觉反馈、无障碍支持等专业级功能</p>
+                    <div class="hero-buttons">
+                        <a href="#interactive-preview" class="btn btn-primary">体验交互预览</a>
+                        <a href="#enhancements" class="btn btn-secondary">查看增强功能</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GUI增强功能展示 -->
+        <section id="enhancements" class="enhancements">
+            <div class="container">
+                <h2 class="section-title">GUI增强功能</h2>
+                <div class="enhancements-grid">
+                    <div class="enhancement-card">
+                        <div class="enhancement-icon">🧭</div>
+                        <h3>智能导航面板</h3>
+                        <p>上下文感知的导航系统，提供直观的文件浏览和快速操作入口。</p>
+                        <ul class="enhancement-features">
+                            <li>面包屑导航路径</li>
+                            <li>最近文件快速访问</li>
+                            <li>上下文相关的快捷操作</li>
+                            <li>可折叠的侧边栏设计</li>
+                            <li>智能文件分类显示</li>
+                        </ul>
+                    </div>
+
+                    <div class="enhancement-card">
+                        <div class="enhancement-icon">✨</div>
+                        <h3>视觉反馈管理器</h3>
+                        <p>丰富的视觉反馈系统，提供流畅的用户交互体验和状态提示。</p>
+                        <ul class="enhancement-features">
+                            <li>优雅的Toast通知系统</li>
+                            <li>实时进度指示器</li>
+                            <li>加载状态骨架屏</li>
+                            <li>微交互动画效果</li>
+                            <li>状态变化平滑过渡</li>
+                        </ul>
+                    </div>
+
+                    <div class="enhancement-card">
+                        <div class="enhancement-icon">♿</div>
+                        <h3>无障碍管理器</h3>
+                        <p>完整的可访问性支持，确保所有用户都能顺畅使用应用程序。</p>
+                        <ul class="enhancement-features">
+                            <li>完整的键盘导航支持</li>
+                            <li>屏幕阅读器兼容性</li>
+                            <li>高对比度主题模式</li>
+                            <li>焦点管理和指示</li>
+                            <li>WCAG 2.1 AA标准合规</li>
+                        </ul>
+                    </div>
+
+                    <div class="enhancement-card">
+                        <div class="enhancement-icon">📁</div>
+                        <h3>丰富文件显示</h3>
+                        <p>多视图模式的文件浏览器，支持缩略图、元数据和高级搜索功能。</p>
+                        <ul class="enhancement-features">
+                            <li>列表、网格、详情视图</li>
+                            <li>文件类型图标和缩略图</li>
+                            <li>元数据工具提示</li>
+                            <li>实时搜索和过滤</li>
+                            <li>文件预览功能</li>
+                        </ul>
+                    </div>
+
+                    <div class="enhancement-card">
+                        <div class="enhancement-icon">⚡</div>
+                        <h3>虚拟化归档视图</h3>
+                        <p>高性能的大型归档文件处理，支持百万级文件列表的流畅浏览。</p>
+                        <ul class="enhancement-features">
+                            <li>虚拟化渲染技术</li>
+                            <li>懒加载和预测性加载</li>
+                            <li>内存高效的缓存系统</li>
+                            <li>后台数据加载</li>
+                            <li>平滑滚动体验</li>
+                        </ul>
+                    </div>
+
+                    <div class="enhancement-card">
+                        <div class="enhancement-icon">🎛️</div>
+                        <h3>上下文菜单管理器</h3>
+                        <p>智能的右键菜单系统，根据文件类型和操作上下文动态生成菜单。</p>
+                        <ul class="enhancement-features">
+                            <li>文件类型特定操作</li>
+                            <li>动态菜单生成</li>
+                            <li>插件扩展支持</li>
+                            <li>键盘快捷键集成</li>
+                            <li>用户自定义菜单</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 交互式GUI预览 -->
+        <section id="interactive-preview" class="interactive-preview">
+            <div class="container">
+                <h2 class="section-title">交互式界面预览</h2>
+                <div class="preview-container">
+                    <div class="window-header">
+                        <div class="window-controls">
+                            <div class="window-control control-close"></div>
+                            <div class="window-control control-minimize"></div>
+                            <div class="window-control control-maximize"></div>
+                        </div>
+                        <div class="window-title">Flux Archive Manager - Enhanced GUI</div>
+                    </div>
+                    <div class="gui-content">
+                        <!-- 智能导航面板 -->
+                        <div class="smart-sidebar">
+                            <div class="sidebar-header">
+                                <div class="sidebar-title">导航</div>
+                                <div class="breadcrumb">
+                                    <span class="breadcrumb-item">主页</span>
+                                    <span>›</span>
+                                    <span class="breadcrumb-item">文档</span>
+                                    <span>›</span>
+                                    <span class="breadcrumb-item">归档文件</span>
+                                </div>
+                            </div>
+                            
+                            <div class="sidebar-nav">
+                                <div class="nav-section">
+                                    <div class="nav-section-title">主要功能</div>
+                                    <div class="nav-item active">
+                                        <span class="nav-icon">🏠</span>
+                                        <span>欢迎页面</span>
+                                    </div>
+                                    <div class="nav-item">
+                                        <span class="nav-icon">📦</span>
+                                        <span>创建归档</span>
+                                    </div>
+                                    <div class="nav-item">
+                                        <span class="nav-icon">📂</span>
+                                        <span>浏览归档</span>
+                                    </div>
+                                    <div class="nav-item">
+                                        <span class="nav-icon">📤</span>
+                                        <span>提取文件</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="nav-section">
+                                    <div class="nav-section-title">工具</div>
+                                    <div class="nav-item">
+                                        <span class="nav-icon">🔧</span>
+                                        <span>批量操作</span>
+                                    </div>
+                                    <div class="nav-item">
+                                        <span class="nav-icon">⚙️</span>
+                                        <span>设置选项</span>
+                                    </div>
+                                    <div class="nav-item">
+                                        <span class="nav-icon">❓</span>
+                                        <span>帮助支持</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="recent-files">
+                                <div class="recent-title">最近文件</div>
+                                <div class="recent-item">
+                                    <span>📦</span>
+                                    <span>项目备份.zip</span>
+                                </div>
+                                <div class="recent-item">
+                                    <span>📁</span>
+                                    <span>文档归档.7z</span>
+                                </div>
+                                <div class="recent-item">
+                                    <span>📦</span>
+                                    <span>代码库.tar.gz</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 主内容区域 -->
+                        <div class="main-area">
+                            <div class="content-header">
+                                <h2 class="content-title">GUI增强功能演示</h2>
+                                <p class="content-subtitle">体验现代化的用户界面设计和交互效果</p>
+                            </div>
+
+                            <div class="demo-tabs">
+                                <button class="demo-tab active" data-tab="files">文件列表</button>
+                                <button class="demo-tab" data-tab="progress">进度指示</button>
+                                <button class="demo-tab" data-tab="notifications">通知系统</button>
+                            </div>
+
+                            <!-- 文件列表演示 -->
+                            <div class="demo-content active" id="files-demo">
+                                <div class="file-list-demo">
+                                    <div class="file-item">
+                                        <div class="file-icon folder">📁</div>
+                                        <div class="file-info">
+                                            <div class="file-name">Documents</div>
+                                            <div class="file-meta">文件夹 • 12个项目</div>
+                                        </div>
+                                        <div class="file-size">--</div>
+                                    </div>
+                                    <div class="file-item">
+                                        <div class="file-icon archive">📦</div>
+                                        <div class="file-info">
+                                            <div class="file-name">project-backup.zip</div>
+                                            <div class="file-meta">ZIP归档 • 2024-01-15</div>
+                                        </div>
+                                        <div class="file-size">45.2 MB</div>
+                                    </div>
+                                    <div class="file-item">
+                                        <div class="file-icon archive">📦</div>
+                                        <div class="file-info">
+                                            <div class="file-name">source-code.tar.gz</div>
+                                            <div class="file-meta">TAR.GZ归档 • 2024-01-14</div>
+                                        </div>
+                                        <div class="file-size">128.7 MB</div>
+                                    </div>
+                                    <div class="file-item">
+                                        <div class="file-icon document">📄</div>
+                                        <div class="file-info">
+                                            <div class="file-name">readme.txt</div>
+                                            <div class="file-meta">文本文档 • 2024-01-13</div>
+                                        </div>
+                                        <div class="file-size">2.1 KB</div>
+                                    </div>
+                                    <div class="file-item">
+                                        <div class="file-icon folder">📁</div>
+                                        <div class="file-info">
+                                            <div class="file-name">Images</div>
+                                            <div class="file-meta">文件夹 • 8个项目</div>
+                                        </div>
+                                        <div class="file-size">--</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 进度指示演示 -->
+                            <div class="demo-content" id="progress-demo">
+                                <div class="progress-demo">
+                                    <div class="progress-item">
+                                        <div class="progress-label">
+                                            <span>正在创建归档文件...</span>
+                                            <span>75%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 75%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="progress-item">
+                                        <div class="progress-label">
+                                            <span>正在提取文件...</span>
+                                            <span>45%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 45%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="progress-item">
+                                        <div class="progress-label">
+                                            <span>正在验证完整性...</span>
+                                            <span>100%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 100%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 通知系统演示 -->
+                            <div class="demo-content" id="notifications-demo">
+                                <div class="notification-demo">
+                                    <div class="notification">
+                                        <div class="notification-header">
+                                            <div class="notification-icon"></div>
+                                            <div class="notification-title">操作完成</div>
+                                        </div>
+                                        <div class="notification-message">
+                                            归档文件已成功创建，包含 156 个文件，总大小 234.5 MB
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 导航项交互
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 演示标签切换
+        document.querySelectorAll('.demo-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.dataset.tab;
+                
+                // 更新标签状态
+                document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 更新内容显示
+                document.querySelectorAll('.demo-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tabId + '-demo').classList.add('active');
+            });
+        });
+
+        // 文件项悬停效果
+        document.querySelectorAll('.file-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+
+        // 窗口控制按钮交互
+        document.querySelectorAll('.window-control').forEach(control => {
+            control.addEventListener('click', function() {
+                if (this.classList.contains('control-close')) {
+                    // 模拟关闭效果
+                    this.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                } else if (this.classList.contains('control-minimize')) {
+                    // 模拟最小化效果
+                    this.style.transform = 'scaleY(0.3)';
+                    setTimeout(() => {
+                        this.style.transform = 'scaleY(1)';
+                    }, 150);
+                } else if (this.classList.contains('control-maximize')) {
+                    // 模拟最大化效果
+                    const container = document.querySelector('.preview-container');
+                    if (container.style.transform === 'scale(1.05)') {
+                        container.style.transform = 'scale(1)';
+                    } else {
+                        container.style.transform = 'scale(1.05)';
+                    }
+                }
+            });
+        });
+
+        // 滚动效果
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(15, 15, 15, 0.98)';
+                header.style.borderBottomColor = 'rgba(187, 134, 252, 0.4)';
+            } else {
+                header.style.background = 'rgba(20, 20, 20, 0.95)';
+                header.style.borderBottomColor = 'rgba(187, 134, 252, 0.2)';
+            }
+        });
+
+        // 进度条动画
+        const observerOptions = {
+            threshold: 0.5,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const progressFills = entry.target.querySelectorAll('.progress-fill');
+                    progressFills.forEach(fill => {
+                        const width = fill.style.width;
+                        fill.style.width = '0%';
+                        setTimeout(() => {
+                            fill.style.width = width;
+                        }, 300);
+                    });
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.progress-demo').forEach(demo => {
+            observer.observe(demo);
+        });
+
+        // 增强卡片动画
+        const cardObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.enhancement-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = `all 0.6s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.1}s`;
+            cardObserver.observe(card);
+        });
+
+        // 通知自动切换
+        let notificationIndex = 0;
+        const notifications = [
+            {
+                title: '操作完成',
+                message: '归档文件已成功创建，包含 156 个文件，总大小 234.5 MB',
+                type: 'success'
+            },
+            {
+                title: '提取完成',
+                message: '已成功提取 89 个文件到指定目录',
+                type: 'success'
+            },
+            {
+                title: '验证完成',
+                message: '归档文件完整性验证通过，所有文件正常',
+                type: 'info'
+            }
+        ];
+
+        function updateNotification() {
+            const notification = document.querySelector('.notification');
+            if (notification) {
+                const current = notifications[notificationIndex];
+                notification.querySelector('.notification-title').textContent = current.title;
+                notification.querySelector('.notification-message').textContent = current.message;
+                
+                notificationIndex = (notificationIndex + 1) % notifications.length;
+            }
+        }
+
+        // 每5秒更新一次通知
+        setInterval(updateNotification, 5000);
+    </script>
+</body>
+</html>

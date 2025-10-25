@@ -1,0 +1,578 @@
+/* Flux Archive Manager - Enhanced Theme */
+/* Modern UI with improved accessibility, animations, and visual feedback */
+
+/* CSS Custom Properties (Variables) */
+:root {
+    --primary-color: #6200EE;
+    --primary-variant: #3700B3;
+    --secondary-color: #03DAC6;
+    --background-color: #FAFAFA;
+    --surface-color: #FFFFFF;
+    --error-color: #B00020;
+    --warning-color: #FF9800;
+    --success-color: #4CAF50;
+    --info-color: #2196F3;
+    
+    --on-primary: #FFFFFF;
+    --on-secondary: #000000;
+    --on-background: #000000;
+    --on-surface: #000000;
+    --on-error: #FFFFFF;
+    
+    --text-primary: rgba(0, 0, 0, 0.87);
+    --text-secondary: rgba(0, 0, 0, 0.60);
+    --text-disabled: rgba(0, 0, 0, 0.38);
+    
+    --elevation-1: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
+    --elevation-2: 0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12);
+    --elevation-4: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
+    --elevation-8: 0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12);
+    
+    --border-radius-small: 4px;
+    --border-radius-medium: 8px;
+    --border-radius-large: 12px;
+    --border-radius-xlarge: 16px;
+    
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    --font-size-caption: 12px;
+    --font-size-body: 14px;
+    --font-size-subtitle: 16px;
+    --font-size-title: 20px;
+    --font-size-headline: 24px;
+    --font-size-display: 32px;
+    
+    --animation-duration-short: 150ms;
+    --animation-duration-medium: 250ms;
+    --animation-duration-long: 400ms;
+    --animation-easing: cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Global Application Styling */
+QApplication {
+    background-color: var(--background-color);
+    color: var(--text-primary);
+    font-family: "Segoe UI", "SF Pro Display", "Roboto", "Ubuntu", sans-serif;
+    font-size: var(--font-size-body);
+    selection-background-color: var(--primary-color);
+    selection-color: var(--on-primary);
+}
+
+/* Enhanced Focus Indicators */
+*:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    border-radius: var(--border-radius-small);
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-color: #0000FF;
+        --background-color: #FFFFFF;
+        --text-primary: #000000;
+        --border-color: #000000;
+    }
+    
+    * {
+        border-width: 2px !important;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Main Window */
+QMainWindow {
+    background-color: var(--background-color);
+    color: var(--text-primary);
+}
+
+QMainWindow::separator {
+    background-color: rgba(0, 0, 0, 0.12);
+    width: 1px;
+    height: 1px;
+}
+
+QMainWindow::separator:hover {
+    background-color: var(--primary-color);
+}
+
+/* Enhanced Toolbar */
+QToolBar {
+    background: var(--surface-color);
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    spacing: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    min-height: 56px;
+}
+
+QToolBar QToolButton {
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--border-radius-large);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin: var(--spacing-xs);
+    color: var(--text-primary);
+    font-weight: 500;
+    min-width: 48px;
+    min-height: 48px;
+    transition: all var(--animation-duration-short) var(--animation-easing);
+}
+
+QToolBar QToolButton:hover {
+    background-color: rgba(98, 0, 238, 0.08);
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+    box-shadow: var(--elevation-2);
+}
+
+QToolBar QToolButton:pressed {
+    background-color: rgba(98, 0, 238, 0.12);
+    transform: translateY(0px);
+    box-shadow: var(--elevation-1);
+}
+
+QToolBar QToolButton:checked {
+    background-color: var(--primary-color);
+    color: var(--on-primary);
+    box-shadow: var(--elevation-2);
+}
+
+QToolBar QToolButton:disabled {
+    color: var(--text-disabled);
+    background-color: transparent;
+}
+
+/* Enhanced Button Styling */
+QPushButton {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: var(--border-radius-medium);
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-weight: 500;
+    font-size: var(--font-size-body);
+    min-width: 64px;
+    min-height: 40px;
+    transition: all var(--animation-duration-short) var(--animation-easing);
+}
+
+QPushButton:hover {
+    background-color: rgba(98, 0, 238, 0.04);
+    border-color: var(--primary-color);
+    box-shadow: var(--elevation-1);
+    transform: translateY(-1px);
+}
+
+QPushButton:pressed {
+    background-color: rgba(98, 0, 238, 0.08);
+    transform: translateY(0px);
+    box-shadow: none;
+}
+
+QPushButton:disabled {
+    background-color: rgba(0, 0, 0, 0.04);
+    color: var(--text-disabled);
+    border-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Primary Button */
+QPushButton[class="primary"] {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-variant) 100%);
+    color: var(--on-primary);
+    border: none;
+    font-weight: 600;
+    box-shadow: var(--elevation-2);
+}
+
+QPushButton[class="primary"]:hover {
+    background: linear-gradient(135deg, #7C1EF0 0%, #4A00C4 100%);
+    box-shadow: var(--elevation-4);
+    transform: translateY(-2px);
+}
+
+QPushButton[class="primary"]:pressed {
+    background: linear-gradient(135deg, #5500CC 0%, #2E009A 100%);
+    box-shadow: var(--elevation-2);
+    transform: translateY(0px);
+}
+
+/* Floating Action Button */
+QPushButton[class="fab"] {
+    background: var(--secondary-color);
+    color: var(--on-secondary);
+    border: none;
+    border-radius: 28px;
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+    box-shadow: var(--elevation-4);
+}
+
+QPushButton[class="fab"]:hover {
+    box-shadow: var(--elevation-8);
+    transform: scale(1.05);
+}
+
+/* Enhanced List Widget */
+QListWidget {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: var(--border-radius-large);
+    outline: none;
+    padding: var(--spacing-sm);
+    selection-background-color: rgba(98, 0, 238, 0.12);
+}
+
+QListWidget::item {
+    background-color: transparent;
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-medium);
+    margin: var(--spacing-xs);
+    border: 1px solid transparent;
+    transition: all var(--animation-duration-short) var(--animation-easing);
+}
+
+QListWidget::item:selected {
+    background-color: var(--primary-color);
+    color: var(--on-primary);
+    box-shadow: var(--elevation-1);
+}
+
+QListWidget::item:hover:!selected {
+    background-color: rgba(98, 0, 238, 0.04);
+    border-color: rgba(98, 0, 238, 0.12);
+}
+
+QListWidget::item:focus {
+    border-color: var(--primary-color);
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Enhanced Progress Bar */
+QProgressBar {
+    background-color: rgba(0, 0, 0, 0.04);
+    border: none;
+    border-radius: var(--border-radius-large);
+    text-align: center;
+    font-weight: 600;
+    font-size: var(--font-size-caption);
+    color: var(--text-primary);
+    min-height: 8px;
+    max-height: 8px;
+}
+
+QProgressBar::chunk {
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: var(--border-radius-large);
+    transition: width var(--animation-duration-medium) var(--animation-easing);
+}
+
+/* Indeterminate Progress Bar Animation */
+QProgressBar[indeterminate="true"]::chunk {
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--primary-color) 25%, 
+        var(--secondary-color) 50%, 
+        var(--primary-color) 75%, 
+        transparent 100%);
+    animation: progress-slide 2s infinite linear;
+}
+
+@keyframes progress-slide {
+    0% { margin-left: -100%; }
+    100% { margin-left: 100%; }
+}
+
+/* Enhanced Input Fields */
+QLineEdit {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    border: 2px solid rgba(0, 0, 0, 0.12);
+    border-radius: var(--border-radius-medium);
+    padding: var(--spacing-md);
+    font-size: var(--font-size-body);
+    selection-background-color: var(--primary-color);
+    selection-color: var(--on-primary);
+    transition: all var(--animation-duration-short) var(--animation-easing);
+}
+
+QLineEdit:focus {
+    border-color: var(--primary-color);
+    background-color: rgba(98, 0, 238, 0.04);
+    box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.12);
+}
+
+QLineEdit:hover:!focus {
+    border-color: rgba(0, 0, 0, 0.24);
+}
+
+QLineEdit:disabled {
+    background-color: rgba(0, 0, 0, 0.04);
+    color: var(--text-disabled);
+    border-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Enhanced Scroll Bars */
+QScrollBar:vertical {
+    background-color: transparent;
+    width: 12px;
+    border-radius: 6px;
+    margin: 0;
+}
+
+QScrollBar::handle:vertical {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    min-height: 32px;
+    margin: 2px;
+    transition: background-color var(--animation-duration-short) var(--animation-easing);
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+QScrollBar::handle:vertical:pressed {
+    background-color: var(--primary-color);
+}
+
+QScrollBar:horizontal {
+    background-color: transparent;
+    height: 12px;
+    border-radius: 6px;
+    margin: 0;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    min-width: 32px;
+    margin: 2px;
+    transition: background-color var(--animation-duration-short) var(--animation-easing);
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+QScrollBar::handle:horizontal:pressed {
+    background-color: var(--primary-color);
+}
+
+QScrollBar::add-line, QScrollBar::sub-line {
+    border: none;
+    background: none;
+    width: 0;
+    height: 0;
+}
+
+/* Toast Notifications */
+.toast {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: var(--border-radius-large);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-sm);
+    box-shadow: var(--elevation-4);
+    min-width: 288px;
+    max-width: 568px;
+}
+
+.toast.success {
+    border-left: 4px solid var(--success-color);
+}
+
+.toast.warning {
+    border-left: 4px solid var(--warning-color);
+}
+
+.toast.error {
+    border-left: 4px solid var(--error-color);
+}
+
+.toast.info {
+    border-left: 4px solid var(--info-color);
+}
+
+/* Loading Skeleton */
+.skeleton {
+    background: linear-gradient(90deg, 
+        rgba(0, 0, 0, 0.04) 25%, 
+        rgba(0, 0, 0, 0.08) 50%, 
+        rgba(0, 0, 0, 0.04) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: var(--border-radius-small);
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Accessibility Enhancements */
+.high-contrast {
+    border-width: 2px !important;
+    outline-width: 3px !important;
+}
+
+.focus-visible {
+    outline: 3px solid var(--primary-color) !important;
+    outline-offset: 2px !important;
+}
+
+/* Screen Reader Only Content */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Custom Component Styles */
+SmartNavigationPanel {
+    background-color: var(--surface-color);
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    min-width: 280px;
+}
+
+SmartNavigationPanel[collapsed="true"] {
+    min-width: 64px;
+}
+
+RichFileDisplay {
+    background-color: var(--surface-color);
+}
+
+RichFileDisplay QHeaderView::section {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+    padding: var(--spacing-md);
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    font-weight: 600;
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn var(--animation-duration-medium) var(--animation-easing);
+}
+
+.fade-out {
+    animation: fadeOut var(--animation-duration-medium) var(--animation-easing);
+}
+
+.slide-in-left {
+    animation: slideInLeft var(--animation-duration-medium) var(--animation-easing);
+}
+
+.slide-in-right {
+    animation: slideInRight var(--animation-duration-medium) var(--animation-easing);
+}
+
+.bounce {
+    animation: bounce var(--animation-duration-long) var(--animation-easing);
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes slideInLeft {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes bounce {
+    0%, 20%, 53%, 80%, 100% { transform: translate3d(0, 0, 0); }
+    40%, 43% { transform: translate3d(0, -8px, 0); }
+    70% { transform: translate3d(0, -4px, 0); }
+    90% { transform: translate3d(0, -2px, 0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    :root {
+        --spacing-md: 12px;
+        --spacing-lg: 16px;
+        --font-size-body: 16px;
+    }
+    
+    QToolBar {
+        min-height: 48px;
+    }
+    
+    QPushButton {
+        min-height: 44px;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+}
+
+/* Dark Theme Variant */
+[data-theme="dark"] {
+    --background-color: #121212;
+    --surface-color: #1E1E1E;
+    --text-primary: rgba(255, 255, 255, 0.87);
+    --text-secondary: rgba(255, 255, 255, 0.60);
+    --text-disabled: rgba(255, 255, 255, 0.38);
+    --primary-color: #BB86FC;
+    --primary-variant: #985EFF;
+    --secondary-color: #03DAC6;
+    --on-primary: #000000;
+    --on-secondary: #000000;
+}
+
+/* Print Styles */
+@media print {
+    * {
+        background: white !important;
+        color: black !important;
+        box-shadow: none !important;
+    }
+    
+    .no-print {
+        display: none !important;
+    }
+}

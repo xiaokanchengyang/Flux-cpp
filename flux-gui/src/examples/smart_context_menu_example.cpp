@@ -285,3 +285,7 @@ int main(int argc, char *argv[]) {
 }
 
 #include "smart_context_menu_example.moc"
+
+
+
+

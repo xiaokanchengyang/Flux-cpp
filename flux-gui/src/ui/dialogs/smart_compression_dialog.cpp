@@ -699,3 +699,7 @@ void SmartCompressionDialog::setDefaultOutputPath(const QString& path) {
 }
 
 } // namespace FluxGUI::UI::Dialogs
+
+
+
+

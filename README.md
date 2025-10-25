@@ -191,28 +191,91 @@ Flux-cpp/
 
 ## 🛠️ Development
 
-### Code Style
+### Code Style and Quality
+
+This project follows strict code quality standards with automated enforcement:
+
+#### Code Formatting
+```bash
+# Format all code (run before committing)
+find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" | xargs clang-format -i
+
+# Check formatting without changes
+clang-format --dry-run --Werror src/**/*.cpp
+```
+
+#### Quality Checks
+```bash
+# Run comprehensive quality checks
+./scripts/run_quality_checks.sh    # Linux/macOS
+.\scripts\run_quality_checks.ps1   # Windows
+
+# Individual checks
+cmake --build build --target clang-tidy  # Static analysis
+ctest --test-dir build                    # Unit tests
+```
+
+#### Pre-commit Hooks
+```bash
+# Install pre-commit hooks (recommended)
+pip install pre-commit
+pre-commit install
+
+# Run hooks manually
+pre-commit run --all-files
+```
+
+### Development Standards
 - **Modern C++23**: Uses latest language features including `std::expected`, `std::span`
+- **Zero Warnings**: All code must compile without warnings
 - **RAII**: Proper resource management with smart pointers
 - **Error Handling**: Comprehensive error handling with meaningful messages
+- **Thread Safety**: Async operations with proper synchronization
 - **Documentation**: Inline documentation and comprehensive README files
 
 ### Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+#### Quick Start
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+3. **Run quality checks locally** (`./scripts/run_quality_checks.sh`)
+4. Commit your changes (`git commit -m 'Add amazing feature'`)
+5. Push to the branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request using the provided template
+
+#### Pull Request Requirements
+- [ ] All CI checks pass (build, tests, static analysis)
+- [ ] Code follows project style (`.clang-format`)
+- [ ] New features include unit tests
+- [ ] Documentation updated if needed
+- [ ] No compiler warnings or static analysis issues
 
 ### Testing
 ```bash
-# Run tests
+# Run all tests
 cd build
 ctest --output-on-failure
 
-# Run specific tests
+# Run specific test suites
 ./flux-core/tests/test_archive_utils
+./flux-core/tests/test_extractor
+./flux-core/tests/test_packer
+
+# Run with memory checking (Linux)
+ctest -T memcheck
 ```
+
+### Continuous Integration
+
+The project uses GitHub Actions for automated quality assurance:
+
+- **Multi-platform builds** (Linux, Windows, macOS)
+- **Static analysis** with clang-tidy
+- **Memory safety** testing with sanitizers
+- **Code formatting** validation
+- **Unit test** execution with coverage reporting
 
 ## 📊 Performance
 

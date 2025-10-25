@@ -5,9 +5,11 @@ cmake_minimum_required(VERSION 3.22)
 find_package(GTest REQUIRED)
 find_package(Threads REQUIRED)
 
-# Create test executable
+# Create test executables
 add_executable(flux-core-tests
     test_archive_utils.cpp
+    test_extractor.cpp
+    test_packer.cpp
 )
 
 # Link libraries

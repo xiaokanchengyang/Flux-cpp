@@ -1,7 +1,7 @@
 # Flux GUI 测试构建脚本
 param(
     [string]$BuildType = "Debug",
-    [string]$QtPath = "",
+    [string]$QtPath = "C:\Qt",
     [switch]$Clean = $false
 )
 

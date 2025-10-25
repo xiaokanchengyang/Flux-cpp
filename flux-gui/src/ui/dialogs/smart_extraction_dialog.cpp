@@ -628,3 +628,7 @@ void SmartExtractionDialog::setSelectedFiles(const QStringList& files) {
 }
 
 } // namespace FluxGUI::UI::Dialogs
+
+
+
+
